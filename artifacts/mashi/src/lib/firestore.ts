@@ -26,26 +26,18 @@ export function subscribeToProducts(
   callback: (products: Product[]) => void,
   onError?: (e: Error) => void
 ): Unsubscribe {
-  const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
   return onSnapshot(
-    q,
+    collection(db, "products"),
     (snapshot) => {
       const products: Product[] = snapshot.docs.map((d) => ({
         id: d.id,
         ...(d.data() as Omit<Product, "id">),
       }));
+      products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       callback(products);
     },
     (error) => {
-      if (error.code === "failed-precondition") {
-        getDocs(collection(db, "products")).then((snap) => {
-          callback(
-            snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Product, "id">) }))
-          );
-        });
-      } else {
-        onError?.(error as Error);
-      }
+      onError?.(error as Error);
     }
   );
 }
@@ -125,13 +117,12 @@ export function subscribeToNotifications(
 ): Unsubscribe {
   const q = query(
     collection(db, "notifications"),
-    where("userId", "==", userId),
-    orderBy("createdAt", "desc")
+    where("userId", "==", userId)
   );
   return onSnapshot(q, (snap) => {
-    callback(
-      snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Notification, "id">) }))
-    );
+    const notifs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Notification, "id">) }));
+    notifs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    callback(notifs);
   });
 }
 
