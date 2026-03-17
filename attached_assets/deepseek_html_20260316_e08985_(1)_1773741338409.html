@@ -1,0 +1,3698 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ماشي - السوق المتكامل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        /* أنماط CSS الأساسية - نفس الأنماط السابقة */
+        @media (max-width: 768px) {
+            :root {
+                --safe-area-inset-top: env(safe-area-inset-top, 0px);
+                --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+                --safe-area-inset-left: env(safe-area-inset-left, 0px);
+                --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            }
+            body {
+                padding-top: var(--safe-area-inset-top);
+                padding-bottom: var(--safe-area-inset-bottom);
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                font-size: 14px;
+                overflow-x: hidden;
+                width: 100vw;
+                max-width: 100%;
+            }
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+            min-height: 100vh;
+            width: 100%;
+        }
+        
+        /* تحسينات للهواتف */
+        @media (max-width: 640px) {
+            html {
+                font-size: 14px;
+            }
+            
+            .container-mobile {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            .header-mobile {
+                padding: 10px 12px !important;
+            }
+            
+            .main-mobile {
+                padding: 15px 12px !important;
+                padding-bottom: 80px !important;
+                padding-top: 70px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .grid-mobile {
+                gap: 12px !important;
+            }
+            
+            .card-mobile {
+                min-height: auto !important;
+                margin-bottom: 12px !important;
+            }
+            
+            .text-responsive {
+                font-size: clamp(0.875rem, 3vw, 1rem) !important;
+            }
+            
+            .text-title {
+                font-size: clamp(1.25rem, 5vw, 1.5rem) !important;
+            }
+            
+            .text-subtitle {
+                font-size: clamp(1rem, 4vw, 1.25rem) !important;
+            }
+            
+            .btn-mobile {
+                min-height: 44px !important;
+                min-width: 44px !important;
+                padding: 10px 16px !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .input-mobile {
+                font-size: 16px !important;
+                padding: 12px !important;
+            }
+        }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background-color: #6366f1; border-radius: 2px; }
+        button, a, [role="button"] { touch-action: manipulation; min-height: 44px; min-width: 44px; }
+        input, textarea, select { font-size: 16px !important; }
+        
+        @media (max-width: 640px) {
+            .product-card { min-height: auto !important; height: auto !important; margin-bottom: 1rem; }
+            .product-image-container { height: 180px !important; }
+            .product-grid-large { 
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important; 
+                gap: 12px !important; 
+            }
+            .product-content { padding: 10px !important; }
+            .product-footer { padding-top: 10px !important; }
+            
+            /* تحسين شريط التنقل السفلي */
+            .nav-buttons-container { 
+                position: fixed !important; 
+                bottom: 0 !important; 
+                left: 0 !important; 
+                right: 0 !important; 
+                z-index: 999 !important; 
+                background: white !important; 
+                border-top: 1px solid #e5e7eb !important; 
+                padding: 8px 8px !important; 
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.1) !important; 
+                display: flex !important; 
+                justify-content: space-around !important; 
+                align-items: center !important; 
+                height: 60px !important; 
+                padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+                padding-left: env(safe-area-inset-left) !important;
+                padding-right: env(safe-area-inset-right) !important;
+            }
+            
+            .nav-btn { 
+                flex: 1 !important; 
+                margin: 0 2px !important; 
+                padding: 6px 4px !important; 
+                border-radius: 10px !important; 
+                font-size: 0.7rem !important; 
+                display: flex !important; 
+                flex-direction: column !important; 
+                align-items: center !important; 
+                justify-content: center !important; 
+                height: 44px !important; 
+                min-height: 44px !important;
+                min-width: 44px !important;
+            }
+            
+            .nav-btn i {
+                width: 18px !important;
+                height: 18px !important;
+                margin-bottom: 3px !important;
+            }
+            
+            main { 
+                padding-bottom: 70px !important; 
+                padding-top: 70px !important; 
+            }
+            
+            /* تحسين الهيدر */
+            header {
+                padding: 10px 12px !important;
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+            }
+            
+            /* تحسين المودالات للهواتف */
+            .modal-mobile {
+                width: 95% !important;
+                max-width: 95% !important;
+                max-height: 90vh !important;
+                margin: 0 10px !important;
+                padding: 16px !important;
+            }
+            
+            .modal-overlay-mobile {
+                padding: 0 10px !important;
+            }
+            
+            /* تحسين عرض المنتجات في الشبكة */
+            .product-card {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            
+            /* تحسين الأزرار */
+            .btn-compact {
+                padding: 10px !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* تحسين النصوص الطويلة */
+            .truncate-mobile {
+                display: -webkit-box !important;
+                -webkit-line-clamp: 2 !important;
+                -webkit-box-orient: vertical !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            
+            /* تحسين الصور */
+            img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* تحسين القوائم */
+            .dropdown-mobile {
+                width: 280px !important;
+                max-width: 90vw !important;
+                right: 10px !important;
+                left: auto !important;
+            }
+        }
+        
+        /* إضافة تحسينات للشاشات الصغيرة جداً */
+        @media (max-width: 375px) {
+            .product-grid-large { 
+                grid-template-columns: 1fr !important; 
+            }
+            
+            .nav-btn span {
+                font-size: 0.65rem !important;
+            }
+            
+            .modal-mobile {
+                width: 98% !important;
+                padding: 12px !important;
+            }
+        }
+        
+        .input-field:valid { border-color: #10b981; background-color: #f0fdf4; }
+        .input-field:invalid:not(:placeholder-shown) { border-color: #ef4444; background-color: #fef2f2; }
+        .input-field:invalid:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+        .email-verified { border-color: #10b981 !important; background-color: #f0fdf4 !important; }
+        .email-unverified { border-color: #f59e0b !important; background-color: #fffbeb !important; }
+        .password-strength { height: 4px; border-radius: 2px; margin-top: 4px; transition: all 0.3s ease; }
+        .password-strength-weak { background-color: #ef4444; width: 25%; }
+        .password-strength-medium { background-color: #f59e0b; width: 50%; }
+        .password-strength-strong { background-color: #10b981; width: 100%; }
+        .product-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15); }
+        .my-product { border: 2px solid #14b8a6; background-color: #f0fdfa; }
+        .nav-btn.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
+        [data-lucide] { stroke-width: 2; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }
+        .animate-pulse-ring { animation: pulse-ring 2s infinite; }
+        .btn-mashi-active { background-color: #dcfce7; color: #15803d; border-color: #86efac; }
+        .btn-mashi-inactive { background-color: #f3f4f6; color: #6b7280; border-color: transparent; cursor: pointer; transition: all 0.2s ease; }
+        .btn-mashi-inactive:hover { background-color: #e5e7eb; transform: scale(1.05); }
+        .login-card { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .user-avatar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .store-avatar { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .guest-avatar { background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%); }
+        .input-field:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .account-type-card { transition: all 0.3s ease; border: 2px solid transparent; cursor: pointer; }
+        .account-type-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .account-type-card.selected { border-color: #4f46e5; background-color: #eef2ff; }
+        .active-indicator { position: absolute; top: -5px; right: -5px; width: 12px; height: 12px; background-color: #10b981; border-radius: 50%; border: 2px solid white; }
+        .my-products-btn { position: relative; background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%); color: white; font-weight: bold; padding-right: 3rem; }
+        .my-products-btn:hover { background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%); transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3); }
+        .count-badge { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: white; color: #7c3aed; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+        .divider { display: flex; align-items: center; text-align: center; margin: 20px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e5e7eb; }
+        .divider span { padding: 0 15px; color: #6b7280; font-size: 14px; }
+        .login-scrollable { max-height: 60vh; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #c7d2fe #f1f5f9; }
+        .login-scrollable::-webkit-scrollbar { width: 6px; }
+        .login-scrollable::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .login-scrollable::-webkit-scrollbar-thumb { background-color: #c7d2fe; border-radius: 10px; }
+        .like-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
+        .like-btn:active { transform: scale(0.9); }
+        .like-btn.liked { animation: likePulse 0.5s ease; }
+        @keyframes likePulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .compact-login-card { max-width: 500px; padding: 0.5rem; }
+        .compact-account-type { padding: 1rem; }
+        .compact-form { padding: 0.5rem 0; }
+        .compact-title { font-size: 1.5rem; margin-bottom: 1rem; }
+        .compact-icon { width: 3rem; height: 3rem; }
+        .contact-btn { transition: all 0.3s ease; border: none; color: white; font-weight: bold; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none; cursor: pointer; padding: 8px 12px; min-width: 100px; }
+        .whatsapp-btn { background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); }
+        .whatsapp-btn:hover { background: linear-gradient(135deg, #1da851 0%, #0e7a5e 100%); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+        .instagram-btn { background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D); }
+        .instagram-btn:hover { background: linear-gradient(45deg, #3448c9, #4a44c0, #6d2f9a, #a0276b, #c2285d, #e01a1a); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(193, 53, 132, 0.3); }
+        .seller-info { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 10px; padding: 12px; margin-top: 12px; border: 1px solid #e5e7eb; }
+        .seller-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .store-badge { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #db2777; border: 1px solid #f9a8d4; }
+        .user-badge { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); color: #4f46e5; border: 1px solid #a5b4fc; }
+        .price-tag { font-family: 'Cairo', sans-serif; direction: ltr; }
+        .product-info-container { display: flex; flex-direction: column; height: 100%; }
+        .product-description { 
+            min-height: 60px; 
+            max-height: 80px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+        }
+        .contact-buttons-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .product-image-container { height: 260px; overflow: hidden; position: relative; }
+        .product-image-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .product-card:hover .product-image-container img { transform: scale(1.05); }
+        .product-content { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+        .product-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid #f1f5f9; }
+        .contact-field { border-left: 4px solid transparent; padding-right: 12px; }
+        .whatsapp-field { border-left-color: #25D366; }
+        .instagram-field { border-left-color: #E1306C; }
+        .contact-preview { background: linear-gradient(135deg, #f0fff4 0%, #f8fafc 100%); border: 1px solid #e2e8f0; }
+        .add-modal-container { max-width: 700px !important; width: 90%; }
+        .product-grid-large { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; }
+        .favorites-container { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 16px; padding: 20px; }
+        .favorite-page-ad { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; animation: fadeInUp 0.8s ease-out; }
+        .favorite-page-ad h4 { font-size: 1.25rem; font-weight: bold; margin-bottom: 8px; }
+        .favorite-page-ad p { opacity: 0.9; margin-bottom: 16px; }
+        .ad-action-btn { background: white; color: #1d4ed8; padding: 10px 24px; border-radius: 8px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .ad-action-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .favorite-card { border: 2px solid #fef3c7; background: linear-gradient(135deg, #ffffff 0%, #fefce8 100%); transition: all 0.3s ease; }
+        .favorite-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px -5px rgba(245, 158, 11, 0.1); }
+        .empty-favorites { text-align: center; padding: 60px 20px; }
+        .empty-favorites-icon { color: #d1d5db; margin-bottom: 16px; }
+        .favorite-heart-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .favorite-heart-btn.active { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; border-color: #f59e0b; }
+        .favorite-heart-btn.active::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at center, rgba(245, 158, 11, 0.1) 0%, transparent 70%); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.05); } 100% { opacity: 0.5; transform: scale(1); } }
+        .favorites-header-btn { position: relative; }
+        .favorites-count-badge { position: absolute; top: -5px; left: -5px; background: #ef4444; color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border: 2px solid white; }
+        
+        /* أنماط جديدة لزر "اطلب الآن" */
+        .order-now-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .order-now-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        .order-now-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .order-modal-overlay {
+            backdrop-filter: blur(8px);
+        }
+        .order-form-container {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .product-preview-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%);
+            border: 2px solid #dcfce7;
+        }
+        .contact-success {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            border: 2px solid #93c5fd;
+        }
+        
+        /* أنماط جديدة لطلباتي */
+        .order-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .order-status-new {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .order-status-pending {
+            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+            color: #1e40af;
+            border: 1px solid #60a5fa;
+        }
+        .order-status-completed {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+        .order-status-cancelled {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+        .order-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .orders-tab-btn {
+            background: white;
+            border: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .orders-tab-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        .orders-tab-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+        .orders-badge {
+            background: #ef4444;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .order-product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .orders-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        /* أنماط جديدة للإشعارات */
+        .notification-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+        .notification-card.unread {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-color: #38bdf8;
+        }
+        .notification-badge {
+            background: #ef4444;
+            color: white;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .notification-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .notification-type-order {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        .notification-type-system {
+            background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+            color: #1e40af;
+            border: 1px solid #60a5fa;
+        }
+        .notification-type-promo {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+        .notifications-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .notifications-tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .notifications-tab-btn.active {
+            background: white;
+            color: #8b5cf6;
+        }
+        .notifications-tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .notification-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .empty-notifications {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            border: 2px dashed #e5e7eb;
+        }
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .notification-action-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .notification-view-btn {
+            background: #3b82f6;
+            color: white;
+        }
+        .notification-view-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        .notification-delete-btn {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .notification-delete-btn:hover {
+            background: #e5e7eb;
+        }
+        
+        /* تحسينات إضافية للهواتف */
+        @media (max-width: 640px) {
+            .orders-header, .notifications-header {
+                padding: 16px !important;
+                margin-bottom: 16px !important;
+            }
+            
+            .orders-tab-btn, .notifications-tab-btn {
+                padding: 6px 12px !important;
+                font-size: 0.75rem !important;
+            }
+            
+            .order-card, .notification-card {
+                padding: 12px !important;
+            }
+            
+            .contact-buttons-container {
+                flex-direction: column !important;
+            }
+            
+            .contact-btn {
+                width: 100% !important;
+            }
+            
+            /* تحسين الصور في المنتجات */
+            .product-image-container {
+                height: 160px !important;
+            }
+            
+            /* تحسين أزرار المفضلة */
+            .favorite-heart-btn {
+                width: 44px !important;
+                height: 44px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+            
+            /* تحسين النصوص */
+            .product-description {
+                -webkit-line-clamp: 2 !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .seller-info {
+                padding: 8px !important;
+            }
+            
+            /* تحسين التبويبات */
+            .nav-buttons-container .nav-btn {
+                font-size: 0.7rem !important;
+            }
+        }
+        
+        /* منع التكبير في حقول الإدخال على iOS */
+        @media (max-width: 768px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+            
+            input:focus, textarea:focus, select:focus {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* تحسينات للأجهزة التي لديها شقوق (notch) */
+        @supports (padding: max(0px)) {
+            .safe-area-top {
+                padding-top: max(env(safe-area-inset-top), 10px);
+            }
+            
+            .safe-area-bottom {
+                padding-bottom: max(env(safe-area-inset-bottom), 10px);
+            }
+            
+            .safe-area-left {
+                padding-left: max(env(safe-area-inset-left), 10px);
+            }
+            
+            .safe-area-right {
+                padding-right: max(env(safe-area-inset-right), 10px);
+            }
+        }
+        
+        /* أنماط جديدة لواجهة تسجيل الدخول المبسطة */
+        .simple-login-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .create-account-link {
+            color: #4f46e5;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .create-account-link:hover {
+            color: #6366f1;
+            text-decoration: underline;
+        }
+        
+        .signup-form-container {
+            display: none;
+        }
+        
+        .signup-form-container.active {
+            display: block;
+        }
+        
+        .login-form-container {
+            display: block;
+        }
+        
+        .login-form-container.hidden {
+            display: none;
+        }
+
+        /* أنماط شريط التمرير لنموذج إنشاء الحساب */
+        .signup-scrollable {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-left: 5px;
+            padding-right: 5px;
+            scrollbar-width: thin;
+            scrollbar-color: #4f46e5 #e2e8f0;
+        }
+
+        .signup-scrollable::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .signup-scrollable::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .signup-scrollable::-webkit-scrollbar-thumb {
+            background-color: #4f46e5;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .signup-scrollable::-webkit-scrollbar-thumb:hover {
+            background-color: #6366f1;
+        }
+
+        /* تلميح التمرير */
+        .scroll-hint {
+            text-align: center;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-hint i {
+            animation: moveUpDown 1.5s infinite;
+        }
+
+        @keyframes moveUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+
+        /* أنماط للتحقق الفوري في نموذج إنشاء الحساب */
+        .field-error {
+            color: #dc2626;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .field-error i {
+            width: 14px;
+            height: 14px;
+        }
+        .field-success {
+            color: #10b981;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .password-strength-container {
+            margin-top: 4px;
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .strength-weak { background-color: #ef4444; }
+        .strength-medium { background-color: #f59e0b; }
+        .strength-strong { background-color: #10b981; }
+
+        /* أنماط حقل كلمة المرور مع أيقونة العين */
+        .password-input-container {
+            position: relative;
+            width: 100%;
+        }
+        .password-input-container input {
+            width: 100%;
+            padding-left: 40px !important;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            transition: color 0.2s ease;
+            min-height: auto;
+            min-width: auto;
+        }
+        .password-toggle-btn:hover {
+            color: #4f46e5;
+        }
+        .password-toggle-btn i {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+
+    <script>
+        // إعدادات Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAy6wfiGiHj-5HNCZYmGFFpD0sC0Vl_LV8",
+            authDomain: "mashi-ddfbc.firebaseapp.com",
+            projectId: "mashi-ddfbc",
+            storageBucket: "mashi-ddfbc.firebasestorage.app",
+            messagingSenderId: "637669168604",
+            appId: "1:637669168604:web:a444d73682cd8ff8e7eb19",
+            measurementId: "G-N2B79HG2GH"
+        };
+
+        // تهيئة الحالة
+        window.state = {
+            products: [],
+            cartItems: {},
+            isAuthReady: false,
+            isLoggedIn: false,
+            userType: null,
+            currentView: 'store',
+            favorites: [],
+            myProductsCount: 0,
+            isGuest: false,
+            likedProducts: new Set(),
+            showFavoriteAd: false,
+            favoriteAdShown: false,
+            orderModalProduct: null,
+            myOrders: [],
+            ordersTab: 'pending',
+            newOrdersCount: 0,
+            notifications: [],
+            notificationsTab: 'all',
+            unreadNotificationsCount: 0,
+            notificationsListener: null,
+            showSignupForm: false
+        };
+
+        window.userData = null;
+        window.userId = null;
+        window.firebaseInitialized = false;
+        window.db = null;
+        window.auth = null;
+
+        // دالة تحديث الأيقونات
+        window.refreshIcons = function() {
+            if (window.lucide && window.lucide.createIcons) {
+                try {
+                    window.lucide.createIcons();
+                } catch (e) {
+                    console.log("Error refreshing icons:", e);
+                }
+            }
+        };
+
+        // دالة التنبيهات
+        window.showToast = function(msg, bgClass) {
+            const toast = document.getElementById('toast');
+            if (!toast) {
+                const toastDiv = document.createElement('div');
+                toastDiv.id = 'toast';
+                toastDiv.className = 'fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-bold shadow-xl transition-all duration-300 z-[70] hidden';
+                document.body.appendChild(toastDiv);
+            }
+            const toastElement = document.getElementById('toast');
+            toastElement.innerText = msg;
+            toastElement.className = `fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-bold shadow-xl transition-all duration-300 z-[70] ${bgClass}`;
+            toastElement.classList.remove('hidden');
+            toastElement.style.opacity = '1';
+            
+            setTimeout(() => { 
+                toastElement.style.opacity = '0';
+                setTimeout(() => {
+                    toastElement.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        };
+
+        // دالة نافذة التأكيد
+        window.showConfirmModal = function(title, message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('confirm-modal');
+                if (!modal) { resolve(false); return; }
+                const titleEl = document.getElementById('confirm-title');
+                const messageEl = document.getElementById('confirm-message');
+                if (titleEl) titleEl.textContent = title;
+                if (messageEl) messageEl.textContent = message;
+                modal.classList.remove('hidden');
+                const confirmBtn = document.getElementById('confirm-action-btn');
+                const cancelBtn = document.getElementById('confirm-cancel-btn');
+                const handleConfirm = () => { modal.classList.add('hidden'); cleanup(); resolve(true); };
+                const handleCancel = () => { modal.classList.add('hidden'); cleanup(); resolve(false); };
+                const cleanup = () => { 
+                    if (confirmBtn) confirmBtn.removeEventListener('click', handleConfirm); 
+                    if (cancelBtn) cancelBtn.removeEventListener('click', handleCancel); 
+                };
+                if (confirmBtn) confirmBtn.addEventListener('click', handleConfirm, { once: true });
+                if (cancelBtn) cancelBtn.addEventListener('click', handleCancel, { once: true });
+            });
+        };
+
+        // دالة فتح فورم الطلب الفوري
+        window.showOrderModal = function(productId) {
+            const product = window.state.products.find(p => p.id === productId);
+            if (!product) {
+                window.showToast("المنتج غير موجود", "bg-yellow-500");
+                return;
+            }
+            
+            window.state.orderModalProduct = product;
+            
+            // تحديث بيانات المنتج في الفورم
+            document.getElementById('order-product-name').textContent = product.name;
+            document.getElementById('order-product-price').textContent = product.price.toFixed(2) + " د.أ";
+            document.getElementById('order-product-brand').textContent = product.brand || "عام";
+            document.getElementById('order-product-seller').textContent = product.sellerName || "بائع";
+            
+            const img = document.getElementById('order-product-image');
+            if (img) {
+                img.src = product.imageUrl;
+                img.onerror = function() {
+                    this.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=صورة+المنتج';
+                };
+            }
+            
+            // إظهار المودال
+            const modal = document.getElementById('order-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                // إعادة تعيين الفورم
+                document.getElementById('order-form').reset();
+            }
+            
+            window.refreshIcons();
+        };
+
+        // دالة إغلاق فورم الطلب
+        window.hideOrderModal = function() {
+            const modal = document.getElementById('order-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                window.state.orderModalProduct = null;
+            }
+        };
+
+        // دالة إرسال طلب فوري
+        window.submitOrder = async function(e) {
+            e.preventDefault();
+            
+            if (!window.state.orderModalProduct) {
+                window.showToast("خطأ في بيانات المنتج", "bg-red-500");
+                return;
+            }
+            
+            const form = e.target;
+            const customerName = form.customerName.value.trim();
+            const customerPhone = form.customerPhone.value.trim();
+            const customerAddress = form.customerAddress.value.trim();
+            const sizeColor = form.sizeColor.value.trim();
+            
+            // التحقق من الحقول المطلوبة
+            if (!customerName || !customerPhone || !customerAddress) {
+                window.showToast("الرجاء ملء جميع الحقول المطلوبة", "bg-red-500");
+                return;
+            }
+            
+            // التحقق من رقم الهاتف
+            const phoneRegex = /^[0-9]{10,15}$/;
+            const cleanPhone = customerPhone.replace(/\D/g, '');
+            if (!phoneRegex.test(cleanPhone)) {
+                window.showToast("الرجاء إدخال رقم هاتف صحيح (10-15 رقم)", "bg-red-500");
+                return;
+            }
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>جاري إرسال الطلب...</span>';
+            submitBtn.disabled = true;
+            
+            try {
+                if (!window.firebaseInitialized) {
+                    const initialized = window.initializeFirebase();
+                    if (!initialized) throw new Error('Failed to initialize Firebase');
+                }
+                
+                const orderData = {
+                    productId: window.state.orderModalProduct.id,
+                    productName: window.state.orderModalProduct.name,
+                    productPrice: window.state.orderModalProduct.price,
+                    productImage: window.state.orderModalProduct.imageUrl,
+                    productBrand: window.state.orderModalProduct.brand,
+                    
+                    sellerId: window.state.orderModalProduct.sellerId,
+                    sellerName: window.state.orderModalProduct.sellerName,
+                    sellerType: window.state.orderModalProduct.sellerType,
+                    
+                    customerName: customerName,
+                    customerPhone: customerPhone,
+                    customerAddress: customerAddress,
+                    sizeColor: sizeColor,
+                    
+                    orderStatus: 'جديد',
+                    orderType: 'طلب فوري',
+                    isGuestOrder: true,
+                    guestSessionId: 'guest-' + Date.now(),
+                    
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    isReadBySeller: false
+                };
+                
+                // حفظ الطلب في Firestore
+                const orderRef = await window.db.collection('orders').add(orderData);
+                
+                // إرسال إشعار للمتجر
+                const notificationData = {
+                    type: 'order',
+                    subType: 'new_order',
+                    title: 'طلب جديد! 🎉',
+                    message: `لديك طلب جديد على منتج ${window.state.orderModalProduct.name} من ${customerName}`,
+                    userId: window.state.orderModalProduct.sellerId,
+                    relatedId: orderRef.id,
+                    relatedType: 'order',
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await window.db.collection('notifications').add(notificationData);
+                
+                // إرسال إشعار للعميل
+                const customerNotification = {
+                    type: 'order',
+                    subType: 'order_confirmed',
+                    title: 'تم تأكيد طلبك! ✅',
+                    message: `تم استلام طلبك على ${window.state.orderModalProduct.name}. سيتواصل معك البائع قريباً.`,
+                    userId: 'guest-' + Date.now(), // أو يمكن استخدام رقم الهاتف إذا كان مسجلاً
+                    relatedId: orderRef.id,
+                    relatedType: 'order',
+                    isRead: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await window.db.collection('notifications').add(customerNotification);
+                
+                // إظهار رسالة نجاح
+                window.showToast("تم إرسال طلبك بنجاح! سيتواصل معك البائع قريباً.", "bg-green-600");
+                
+                // إغلاق المودال وإعادة تعيين الفورم
+                window.hideOrderModal();
+                form.reset();
+                
+                // إظهار معلومات التواصل بعد إرسال الطلب
+                setTimeout(() => {
+                    const contactInfo = `
+                        <div class="contact-success rounded-2xl p-4 mb-4">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="bg-blue-100 p-2 rounded-full">
+                                    <i data-lucide="phone" class="w-5 h-5 text-blue-600"></i>
+                                </div>
+                                <h4 class="font-bold text-gray-900">معلومات التواصل</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">رقم واتساب البائع: <span class="font-bold">${window.state.orderModalProduct.contactPhone || window.state.orderModalProduct.sellerPhone || 'غير متاح'}</span></p>
+                            ${window.state.orderModalProduct.contactInstagram || window.state.orderModalProduct.sellerInstagram ? 
+                                `<p class="text-sm text-gray-600">إنستغرام البائع: <span class="font-bold">${window.state.orderModalProduct.contactInstagram || window.state.orderModalProduct.sellerInstagram}</span></p>` : ''
+                            }
+                            <p class="text-xs text-gray-500 mt-3">يمكنك التواصل مباشرة مع البائع للاستفسار عن تفاصيل الطلب</p>
+                        </div>
+                    `;
+                    
+                    // إضافة معلومات التواصل أعلى المنتجات
+                    const productsGrid = document.getElementById('products-grid');
+                    if (productsGrid) {
+                        // إزالة أي معلومات اتصال سابقة
+                        const existingInfo = document.getElementById('order-contact-info');
+                        if (existingInfo) existingInfo.remove();
+                        
+                        const contactDiv = document.createElement('div');
+                        contactDiv.innerHTML = contactInfo;
+                        contactDiv.id = 'order-contact-info';
+                        productsGrid.parentNode.insertBefore(contactDiv, productsGrid);
+                        
+                        // إزالة المعلومات بعد 30 ثانية
+                        setTimeout(() => {
+                            const infoDiv = document.getElementById('order-contact-info');
+                            if (infoDiv) infoDiv.remove();
+                        }, 30000);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('Error submitting order:', error);
+                window.showToast("حدث خطأ أثناء إرسال الطلب. الرجاء المحاولة لاحقاً.", "bg-red-500");
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                window.refreshIcons();
+            }
+        };
+
+        // دالة تهيئة Firebase
+        window.initializeFirebase = function() {
+            try {
+                if (window.firebaseInitialized) return true;
+                
+                if (typeof firebase === 'undefined') {
+                    window.showToast("خطأ في تحميل النظام الأساسي", "bg-red-500");
+                    return false;
+                }
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                window.db = firebase.firestore();
+                window.auth = firebase.auth();
+                window.firebaseInitialized = true;
+                
+                // تشغيل الاستماع للمنتجات
+                window.startProductListener();
+
+                // مراقبة حالة المصادقة
+                window.auth.onAuthStateChanged(async (user) => {
+                    // تجنب التحديث إذا كان المستخدم مسجل الدخول بالفعل
+                    if (user && window.userId === user.uid && window.state.isLoggedIn) {
+                        return; // المستخدم مسجل بالفعل، لا داعي للتحديث
+                    }
+                    
+                    if (user) {
+                        // فقط إذا لم يكن المستخدم مسجلاً بالفعل
+                        if (!window.state.isLoggedIn || window.userId !== user.uid) {
+                            window.userId = user.uid;
+                            try {
+                                const userDoc = await window.db.collection('users').doc(user.uid).get();
+                                if (userDoc.exists) {
+                                    window.userData = userDoc.data();
+                                    window.userData.emailVerified = user.emailVerified;
+                                    window.state.userType = window.userData.type;
+                                    window.state.isLoggedIn = true;
+                                    window.state.isGuest = false;
+                                    window.updateAuthUI();
+                                    await window.loadUserFavorites();
+                                    await window.loadMyOrders();
+                                    window.startNotificationsListener();
+                                    window.renderProducts();
+                                }
+                            } catch (error) {
+                                console.error('Error loading user data:', error);
+                            }
+                        }
+                    } else {
+                        // تسجيل الخروج
+                        window.userId = null;
+                        window.userData = null;
+                        window.state.isLoggedIn = false;
+                        window.state.isGuest = false;
+                        window.state.favorites = [];
+                        window.state.likedProducts.clear();
+                        window.state.notifications = [];
+                        window.state.unreadNotificationsCount = 0;
+                        window.state.myOrders = [];
+                        window.state.newOrdersCount = 0;
+                        
+                        // إيقاف الاستماع للإشعارات
+                        if (window.state.notificationsListener) {
+                            window.state.notificationsListener();
+                            window.state.notificationsListener = null;
+                        }
+                        
+                        window.updateAuthUI();
+                        window.updateFavoritesCount();
+                        window.updateNotificationsBadge();
+                        window.updateOrdersBadge();
+                        window.renderProducts();
+                    }
+                });
+                return true;
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                window.showToast("خطأ في الاتصال بقاعدة البيانات", "bg-red-500");
+                return false;
+            }
+        };
+
+        // دالة الاستماع للمنتجات في الوقت الفعلي
+        window.startProductListener = function() {
+            if (!window.db) return;
+            
+            window.db.collection('products')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    window.state.products = [];
+                    snapshot.forEach((doc) => {
+                        window.state.products.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // تحديث العداد والواجهة
+                    if (window.userId) {
+                        window.state.myProductsCount = window.state.products.filter(p => p.sellerId === window.userId).length;
+                    }
+                    window.renderProducts();
+                    window.updateMyProductsButton();
+                    
+                    // إذا كنا في صفحة المفضلة، نحدثها أيضاً
+                    if (window.state.currentView === 'favorites') {
+                        window.renderFavorites();
+                    }
+                }, (error) => {
+                    console.error("Error getting products:", error);
+                    // في حالة عدم وجود فهرس، نحاول جلبها بدون ترتيب
+                    if (error.code === 'failed-precondition') {
+                        console.warn("Missing index, falling back to unsorted");
+                        window.db.collection('products').get().then(snap => {
+                            window.state.products = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                            window.renderProducts();
+                        });
+                    }
+                });
+        };
+
+        // دالة تحميل طلباتي
+        window.loadMyOrders = async function() {
+            if (!window.firebaseInitialized || !window.userId || window.state.isGuest) return;
+            try {
+                const snapshot = await window.db.collection('orders')
+                    .where('sellerId', '==', window.userId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+                
+                window.state.myOrders = [];
+                window.state.newOrdersCount = 0;
+                
+                snapshot.forEach(doc => {
+                    const order = { id: doc.id, ...doc.data() };
+                    window.state.myOrders.push(order);
+                    
+                    // عد الطلبات الجديدة غير المقروءة
+                    if (!order.isReadBySeller && order.orderStatus === 'جديد') {
+                        window.state.newOrdersCount++;
+                    }
+                });
+                
+                window.updateOrdersBadge();
+                window.renderOrders();
+                
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                // إذا كان هناك خطأ في الفهرس، نحاول بدون ترتيب
+                if (error.code === 'failed-precondition') {
+                    console.warn("Missing index for orders, trying without sorting");
+                    const snapshot = await window.db.collection('orders')
+                        .where('sellerId', '==', window.userId)
+                        .get();
+                    
+                    window.state.myOrders = [];
+                    snapshot.forEach(doc => {
+                        window.state.myOrders.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // ترتيب يدوي حسب التاريخ
+                    window.state.myOrders.sort((a, b) => {
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                    });
+                    
+                    window.updateOrdersBadge();
+                    window.renderOrders();
+                }
+            }
+        };
+
+        // تحديث شارة عدد الطلبات الجديدة
+        window.updateOrdersBadge = function() {
+            const ordersBadge = document.getElementById('orders-badge');
+            if (ordersBadge) {
+                ordersBadge.textContent = window.state.newOrdersCount;
+                ordersBadge.classList.toggle('hidden', window.state.newOrdersCount === 0);
+            }
+            
+            // تحديث الشارة في القائمة المنسدلة
+            const dropdownBadge = document.getElementById('orders-dropdown-badge');
+            if (dropdownBadge) {
+                dropdownBadge.textContent = window.state.newOrdersCount;
+                dropdownBadge.classList.toggle('hidden', window.state.newOrdersCount === 0);
+            }
+        };
+
+        // تغيير تبويب الطلبات
+        window.setOrdersTab = function(tabName) {
+            window.state.ordersTab = tabName;
+            
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('.orders-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-white', 'text-gray-600');
+            });
+            
+            const activeBtn = document.querySelector(`[data-orders-tab="${tabName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('bg-white', 'text-gray-600');
+            }
+            
+            window.renderOrders();
+        };
+
+        // تحديث حالة الطلب وإرسال إشعار
+        window.updateOrderStatus = async function(orderId, newStatus) {
+            if (!window.firebaseInitialized) return;
+            
+            let confirmMessage = '';
+            if (newStatus === 'مكتمل') {
+                confirmMessage = "هل تريد تأكيد إتمام هذا الطلب؟";
+            } else if (newStatus === 'ملغي') {
+                confirmMessage = "هل تريد تأكيد إلغاء هذا الطلب؟";
+            }
+            
+            const confirmed = await window.showConfirmModal("تحديث حالة الطلب", confirmMessage);
+            if (!confirmed) return;
+            
+            try {
+                const order = window.state.myOrders.find(o => o.id === orderId);
+                if (!order) return;
+                
+                await window.db.collection('orders').doc(orderId).update({
+                    orderStatus: newStatus,
+                    updatedAt: new Date().toISOString(),
+                    isReadBySeller: true
+                });
+                
+                // تحديث القائمة المحلية
+                const orderIndex = window.state.myOrders.findIndex(o => o.id === orderId);
+                if (orderIndex !== -1) {
+                    window.state.myOrders[orderIndex].orderStatus = newStatus;
+                    window.state.myOrders[orderIndex].isReadBySeller = true;
+                }
+                
+                // إعادة حساب الطلبات الجديدة
+                window.state.newOrdersCount = window.state.myOrders.filter(order => 
+                    !order.isReadBySeller && order.orderStatus === 'جديد'
+                ).length;
+                
+                window.updateOrdersBadge();
+                window.renderOrders();
+                
+                // إرسال إشعار للعميل
+                let notificationTitle = '';
+                let notificationMessage = '';
+                
+                if (newStatus === 'مكتمل') {
+                    notificationTitle = 'تم إكمال طلبك! ✅';
+                    notificationMessage = `تم إكمال طلبك على منتج ${order.productName}. شكراً لاختيارك!`;
+                } else if (newStatus === 'ملغي') {
+                    notificationTitle = 'تم إلغاء طلبك ❌';
+                    notificationMessage = `تم إلغاء طلبك على منتج ${order.productName}. للاستفسار، تواصل مع البائع.`;
+                }
+                
+                if (notificationTitle && notificationMessage) {
+                    const customerNotification = {
+                        type: 'order',
+                        subType: newStatus === 'مكتمل' ? 'order_completed' : 'order_cancelled',
+                        title: notificationTitle,
+                        message: notificationMessage,
+                        userId: order.isGuestOrder ? order.guestSessionId : order.customerPhone,
+                        relatedId: orderId,
+                        relatedType: 'order',
+                        isRead: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    await window.db.collection('notifications').add(customerNotification);
+                }
+                
+                window.showToast(`تم تحديث حالة الطلب إلى "${newStatus}"`, "bg-green-600");
+                
+            } catch (error) {
+                console.error("Error updating order:", error);
+                window.showToast("حدث خطأ أثناء تحديث حالة الطلب", "bg-red-500");
+            }
+        };
+
+        // بدء الاستماع للإشعارات
+        window.startNotificationsListener = function() {
+            if (!window.db || !window.userId || window.state.isGuest) return;
+            
+            // إيقاف أي مستمع سابق
+            if (window.state.notificationsListener) {
+                window.state.notificationsListener();
+            }
+            
+            // الاستماع للإشعارات الخاصة بالمستخدم
+            window.state.notificationsListener = window.db.collection('notifications')
+                .where('userId', '==', window.userId)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    window.state.notifications = [];
+                    window.state.unreadNotificationsCount = 0;
+                    
+                    snapshot.forEach((doc) => {
+                        const notification = { id: doc.id, ...doc.data() };
+                        window.state.notifications.push(notification);
+                        
+                        if (!notification.isRead) {
+                            window.state.unreadNotificationsCount++;
+                        }
+                    });
+                    
+                    // تحديث الشارات
+                    window.updateNotificationsBadge();
+                    
+                    // إذا كنا في صفحة الإشعارات، نحدث العرض
+                    if (window.state.currentView === 'notifications') {
+                        window.renderNotifications();
+                    }
+                    
+                }, (error) => {
+                    console.error("Error getting notifications:", error);
+                });
+        };
+
+        // تحديث شارة الإشعارات
+        window.updateNotificationsBadge = function() {
+            // تحديث الشارة في الهيدر
+            const headerBadge = document.getElementById('notifications-count-badge');
+            if (headerBadge) {
+                headerBadge.textContent = window.state.unreadNotificationsCount;
+                headerBadge.classList.toggle('hidden', window.state.unreadNotificationsCount === 0);
+            }
+            
+            // تحديث الشارة في التبويب
+            const tabBadge = document.getElementById('notifications-tab-badge');
+            if (tabBadge) {
+                tabBadge.textContent = window.state.unreadNotificationsCount;
+                tabBadge.classList.toggle('hidden', window.state.unreadNotificationsCount === 0);
+            }
+            
+            // تحديث الشارة في القائمة المنسدلة
+            const dropdownBadge = document.getElementById('notifications-dropdown-badge');
+            if (dropdownBadge) {
+                dropdownBadge.textContent = window.state.unreadNotificationsCount;
+                dropdownBadge.classList.toggle('hidden', window.state.unreadNotificationsCount === 0);
+            }
+        };
+
+        // تغيير تبويب الإشعارات
+        window.setNotificationsTab = function(tabName) {
+            window.state.notificationsTab = tabName;
+            
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('.notifications-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const activeBtn = document.querySelector(`[data-notifications-tab="${tabName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            window.renderNotifications();
+        };
+
+        // عرض الإشعارات
+        window.renderNotifications = function() {
+            const container = document.getElementById('notifications-container');
+            if (!container) return;
+            
+            // تصفية الإشعارات حسب التبويب
+            let filteredNotifications = window.state.notifications;
+            
+            if (window.state.notificationsTab === 'unread') {
+                filteredNotifications = window.state.notifications.filter(n => !n.isRead);
+            } else if (window.state.notificationsTab === 'orders') {
+                filteredNotifications = window.state.notifications.filter(n => n.type === 'order');
+            } else if (window.state.notificationsTab === 'system') {
+                filteredNotifications = window.state.notifications.filter(n => n.type === 'system');
+            }
+            
+            if (filteredNotifications.length === 0) {
+                let message = '';
+                if (window.state.notificationsTab === 'unread') {
+                    message = 'لا توجد إشعارات غير مقروءة';
+                } else if (window.state.notificationsTab === 'orders') {
+                    message = 'لا توجد إشعارات متعلقة بالطلبات';
+                } else if (window.state.notificationsTab === 'system') {
+                    message = 'لا توجد إشعارات نظام';
+                } else {
+                    message = 'لا توجد إشعارات حتى الآن';
+                }
+                
+                container.innerHTML = `
+                    <div class="empty-notifications">
+                        <i data-lucide="bell" class="w-20 h-20 mx-auto text-gray-300 mb-6"></i>
+                        <h3 class="text-2xl font-bold text-gray-700 mb-3">${message}</h3>
+                        <p class="text-gray-500 mb-8 max-w-md mx-auto">سيظهر هنا جميع إشعارات الطلبات والتحديثات المهمة</p>
+                        ${window.state.notificationsTab === 'unread' && window.state.notifications.length > 0 ? 
+                            `<button onclick="window.setNotificationsTab('all')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all">
+                                عرض جميع الإشعارات
+                            </button>` : 
+                            `<button onclick="window.switchView('store')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all">
+                                تصفح المنتجات
+                            </button>`
+                        }
+                    </div>`;
+                setTimeout(() => window.refreshIcons(), 100);
+                return;
+            }
+            
+            container.innerHTML = filteredNotifications.map(notification => {
+                const date = new Date(notification.createdAt);
+                const formattedDate = date.toLocaleDateString('ar-SA', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let typeBadgeClass = 'notification-type-system';
+                let typeIcon = 'bell';
+                let typeText = 'نظام';
+                
+                if (notification.type === 'order') {
+                    typeBadgeClass = 'notification-type-order';
+                    typeIcon = 'package';
+                    typeText = 'طلب';
+                } else if (notification.type === 'promo') {
+                    typeBadgeClass = 'notification-type-promo';
+                    typeIcon = 'tag';
+                    typeText = 'عرض';
+                }
+                
+                let actions = '';
+                if (notification.relatedType === 'order' && notification.relatedId) {
+                    actions = `
+                        <div class="notification-actions">
+                            <button onclick="window.viewOrderDetails('${notification.relatedId}')" class="notification-action-btn notification-view-btn">
+                                <i data-lucide="eye" class="w-3 h-3 inline ml-1"></i>
+                                عرض الطلب
+                            </button>
+                            <button onclick="window.markNotificationAsRead('${notification.id}')" class="notification-action-btn notification-delete-btn">
+                                <i data-lucide="check" class="w-3 h-3 inline ml-1"></i>
+                                تمت القراءة
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    actions = `
+                        <div class="notification-actions">
+                            <button onclick="window.markNotificationAsRead('${notification.id}')" class="notification-action-btn notification-delete-btn">
+                                <i data-lucide="check" class="w-3 h-3 inline ml-1"></i>
+                                تمت القراءة
+                            </button>
+                            <button onclick="window.deleteNotification('${notification.id}')" class="notification-action-btn notification-delete-btn">
+                                <i data-lucide="trash" class="w-3 h-3 inline ml-1"></i>
+                                حذف
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                return `
+                <div class="notification-card ${!notification.isRead ? 'unread' : ''} p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                ${!notification.isRead ? '<span class="notification-badge"></span>' : ''}
+                                <h4 class="font-bold text-gray-900 text-lg">${notification.title}</h4>
+                                <span class="${typeBadgeClass} notification-type-badge">
+                                    <i data-lucide="${typeIcon}" class="w-3 h-3"></i>
+                                    ${typeText}
+                                </span>
+                            </div>
+                            <p class="text-gray-600 mb-3">${notification.message}</p>
+                            <p class="notification-time">
+                                <i data-lucide="clock" class="w-3 h-3 inline ml-1"></i>
+                                ${formattedDate}
+                            </p>
+                        </div>
+                    </div>
+                    ${actions}
+                </div>`;
+            }).join('');
+            
+            setTimeout(() => window.refreshIcons(), 300);
+        };
+
+        // عرض تفاصيل الطلب
+        window.viewOrderDetails = function(orderId) {
+            const order = window.state.myOrders.find(o => o.id === orderId);
+            if (order) {
+                window.switchView('orders');
+                window.setOrdersTab('all');
+                window.showToast("تم فتح صفحة الطلبات", "bg-blue-500");
+                
+                // تمرير للتمرير إلى الطلب المحدد
+                setTimeout(() => {
+                    const orderElement = document.querySelector(`[data-order-id="${orderId}"]`);
+                    if (orderElement) {
+                        orderElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        orderElement.classList.add('bg-yellow-50');
+                        setTimeout(() => {
+                            orderElement.classList.remove('bg-yellow-50');
+                        }, 2000);
+                    }
+                }, 500);
+            } else {
+                window.showToast("الطلب غير موجود", "bg-yellow-500");
+            }
+        };
+
+        // تعليم الإشعار كمقروء
+        window.markNotificationAsRead = async function(notificationId) {
+            try {
+                await window.db.collection('notifications').doc(notificationId).update({
+                    isRead: true,
+                    readAt: new Date().toISOString()
+                });
+                
+                // تحديث الحالة المحلية
+                const notificationIndex = window.state.notifications.findIndex(n => n.id === notificationId);
+                if (notificationIndex !== -1) {
+                    window.state.notifications[notificationIndex].isRead = true;
+                    window.state.unreadNotificationsCount--;
+                }
+                
+                window.updateNotificationsBadge();
+                window.renderNotifications();
+                window.showToast("تم تعليم الإشعار كمقروء", "bg-green-600");
+                
+            } catch (error) {
+                console.error("Error marking notification as read:", error);
+                window.showToast("حدث خطأ أثناء تحديث الإشعار", "bg-red-500");
+            }
+        };
+
+        // حذف الإشعار
+        window.deleteNotification = async function(notificationId) {
+            const confirmed = await window.showConfirmModal("حذف الإشعار", "هل تريد حذف هذا الإشعار؟");
+            if (!confirmed) return;
+            
+            try {
+                await window.db.collection('notifications').doc(notificationId).delete();
+                
+                // تحديث الحالة المحلية
+                const wasUnread = window.state.notifications.find(n => n.id === notificationId && !n.isRead);
+                window.state.notifications = window.state.notifications.filter(n => n.id !== notificationId);
+                
+                if (wasUnread) {
+                    window.state.unreadNotificationsCount--;
+                }
+                
+                window.updateNotificationsBadge();
+                window.renderNotifications();
+                window.showToast("تم حذف الإشعار", "bg-green-600");
+                
+            } catch (error) {
+                console.error("Error deleting notification:", error);
+                window.showToast("حدث خطأ أثناء حذف الإشعار", "bg-red-500");
+            }
+        };
+
+        // تعليم جميع الإشعارات كمقروءة
+        window.markAllNotificationsAsRead = async function() {
+            const unreadNotifications = window.state.notifications.filter(n => !n.isRead);
+            if (unreadNotifications.length === 0) {
+                window.showToast("لا توجد إشعارات غير مقروءة", "bg-blue-500");
+                return;
+            }
+            
+            const confirmed = await window.showConfirmModal(
+                "تعليم الكل كمقروء", 
+                `هل تريد تعليم جميع الإشعارات غير المقروءة (${unreadNotifications.length}) كمقروءة؟`
+            );
+            
+            if (!confirmed) return;
+            
+            try {
+                const batch = window.db.batch();
+                unreadNotifications.forEach(notification => {
+                    const notificationRef = window.db.collection('notifications').doc(notification.id);
+                    batch.update(notificationRef, {
+                        isRead: true,
+                        readAt: new Date().toISOString()
+                    });
+                });
+                
+                await batch.commit();
+                
+                // تحديث الحالة المحلية
+                window.state.notifications.forEach(n => {
+                    if (!n.isRead) n.isRead = true;
+                });
+                window.state.unreadNotificationsCount = 0;
+                
+                window.updateNotificationsBadge();
+                window.renderNotifications();
+                window.showToast("تم تعليم جميع الإشعارات كمقروءة", "bg-green-600");
+                
+            } catch (error) {
+                console.error("Error marking all notifications as read:", error);
+                window.showToast("حدث خطأ أثناء تحديث الإشعارات", "bg-red-500");
+            }
+        };
+
+        // حذف جميع الإشعارات المقروءة
+        window.deleteAllReadNotifications = async function() {
+            const readNotifications = window.state.notifications.filter(n => n.isRead);
+            if (readNotifications.length === 0) {
+                window.showToast("لا توجد إشعارات مقروءة", "bg-blue-500");
+                return;
+            }
+            
+            const confirmed = await window.showConfirmModal(
+                "حذف الإشعارات المقروءة", 
+                `هل تريد حذف جميع الإشعارات المقروءة (${readNotifications.length})؟`
+            );
+            
+            if (!confirmed) return;
+            
+            try {
+                const batch = window.db.batch();
+                readNotifications.forEach(notification => {
+                    const notificationRef = window.db.collection('notifications').doc(notification.id);
+                    batch.delete(notificationRef);
+                });
+                
+                await batch.commit();
+                
+                // تحديث الحالة المحلية
+                window.state.notifications = window.state.notifications.filter(n => !n.isRead);
+                
+                window.updateNotificationsBadge();
+                window.renderNotifications();
+                window.showToast("تم حذف جميع الإشعارات المقروءة", "bg-green-600");
+                
+            } catch (error) {
+                console.error("Error deleting read notifications:", error);
+                window.showToast("حدث خطأ أثناء حذف الإشعارات", "bg-red-500");
+            }
+        };
+
+        // حفظ المفضلة
+        window.saveFavoriteToFirebase = async function(productId, productData) {
+            if (!window.firebaseInitialized || !window.userId || window.state.isGuest) return null;
+            try {
+                const favoriteData = {
+                    userId: window.userId,
+                    productId: productId,
+                    addedAt: new Date().toISOString(),
+                    productName: productData.name || '',
+                    productPrice: productData.price || 0,
+                    productImage: productData.imageUrl || '',
+                };
+                const docRef = await window.db.collection('favorites').add(favoriteData);
+                return { id: docRef.id, ...favoriteData };
+            } catch (error) {
+                window.showToast("خطأ في حفظ المفضلة", "bg-red-500");
+                return null;
+            }
+        };
+
+        // تحميل المفضلة
+        window.loadUserFavorites = async function() {
+            if (!window.firebaseInitialized || !window.userId || window.state.isGuest) return;
+            try {
+                const snapshot = await window.db.collection('favorites').where('userId', '==', window.userId).get();
+                window.state.favorites = [];
+                window.state.likedProducts.clear();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const favorite = { id: doc.id, ...data };
+                    window.state.favorites.push(favorite);
+                    window.state.likedProducts.add(favorite.productId);
+                });
+                window.updateFavoritesCount();
+                window.renderProducts();
+            } catch (error) {
+                console.error("Error loading favorites:", error);
+            }
+        };
+
+        // حذف المفضلة
+        window.removeFavoriteFromFirebase = async function(favoriteId) {
+            if (!window.firebaseInitialized) return false;
+            try {
+                await window.db.collection('favorites').doc(favoriteId).delete();
+                return true;
+            } catch (error) { 
+                console.error("Error removing favorite:", error);
+                return false; 
+            }
+        };
+
+        // تحديث عدد المفضلة
+        window.updateFavoritesCount = function() {
+            const favoritesCount = window.state.favorites.length;
+            const countBadge = document.getElementById('favorites-count-badge');
+            if (countBadge) {
+                countBadge.textContent = favoritesCount;
+                countBadge.classList.toggle('hidden', favoritesCount === 0);
+            }
+            const dropdownCount = document.getElementById('favorites-dropdown-count');
+            if (dropdownCount) {
+                dropdownCount.textContent = favoritesCount;
+                dropdownCount.classList.toggle('hidden', favoritesCount === 0);
+            }
+        };
+
+        // التعامل مع زر الإعجاب
+        window.handleMashiLike = async function(productId) {
+            if (!window.state.isLoggedIn) { 
+                window.showToast("الرجاء تسجيل الدخول للإعجاب", "bg-yellow-600"); 
+                window.showLoginModal(); 
+                return; 
+            }
+            if (window.state.isGuest) { 
+                window.showToast("لا يمكنك الإعجاب كزائر. الرجاء إنشاء حساب", "bg-yellow-600"); 
+                window.showLoginModal(); 
+                return; 
+            }
+            
+            const product = window.state.products.find(p => p.id === productId);
+            if (!product) return;
+            
+            const isLiked = window.state.likedProducts.has(productId);
+            
+            // تحديث الواجهة فوراً
+            if (isLiked) {
+                // إلغاء الإعجاب
+                window.state.likedProducts.delete(productId);
+                
+                const favorite = window.state.favorites.find(f => f.productId === productId && f.userId === window.userId);
+                if (favorite && favorite.id) {
+                    await window.removeFavoriteFromFirebase(favorite.id);
+                    window.state.favorites = window.state.favorites.filter(f => f.id !== favorite.id);
+                }
+                window.showToast("تم إلغاء الإعجاب ❌", "bg-gray-600");
+            } else {
+                // إضافة إعجاب
+                window.state.likedProducts.add(productId);
+
+                const savedFavorite = await window.saveFavoriteToFirebase(productId, product);
+                if (savedFavorite) {
+                    window.state.favorites.push(savedFavorite);
+                    if (!window.state.favoriteAdShown) {
+                        window.state.showFavoriteAd = true;
+                        window.state.favoriteAdShown = true;
+                        setTimeout(() => {
+                            window.state.showFavoriteAd = false;
+                            if (window.state.currentView === 'favorites') window.renderFavorites();
+                        }, 5000);
+                    }
+                    window.showToast("تم الإعجاب! المنتج أضيف إلى المفضلة ❤️", "bg-green-600");
+                }
+            }
+            window.updateFavoritesCount();
+            window.renderProducts();
+            if (window.state.currentView === 'favorites') window.renderFavorites();
+        };
+
+        // عرض صفحة المفضلة
+        window.renderFavorites = function() {
+            const container = document.getElementById('favorites-container');
+            if (!container) return;
+            const myFavorites = window.state.favorites.filter(f => f.userId === window.userId);
+            
+            if (myFavorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-favorites bg-white rounded-2xl p-8">
+                        <i data-lucide="heart-off" class="w-20 h-20 mx-auto text-gray-300 mb-6 empty-favorites-icon"></i>
+                        <h3 class="text-2xl font-bold text-gray-700 mb-3">المفضلة فارغة</h3>
+                        <p class="text-gray-500 mb-8 max-w-md mx-auto">لم تقم بإضافة أي منتجات إلى المفضلة بعد. ابدأ بتصفح المنتجات وأضف ما يعجبك!</p>
+                        <button onclick="window.switchView('store')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-3 mx-auto text-lg">
+                            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                            تصفح المنتجات الآن
+                        </button>
+                    </div>`;
+                setTimeout(() => window.refreshIcons(), 100);
+                return;
+            }
+
+            let html = `
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                    <div class="p-6 border-b border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="p-3 bg-red-50 rounded-xl">
+                                    <i data-lucide="heart" class="w-8 h-8 text-red-500 fill-current"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-black text-gray-900">قائمة المفضلة</h3>
+                                    <p class="text-gray-500 text-sm mt-1">${myFavorites.length} منتج في قائمتك</p>
+                                </div>
+                            </div>
+                            <button onclick="window.clearAllFavorites()" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                مسح الكل
+                            </button>
+                        </div>
+                    </div>`;
+
+            if (window.state.showFavoriteAd) {
+                html += `
+                    <div class="favorite-page-ad mx-6 mt-6">
+                        <div class="flex items-center justify-center gap-3 mb-3">
+                            <i data-lucide="star" class="w-8 h-8 text-yellow-300 fill-current"></i>
+                            <i data-lucide="gift" class="w-8 h-8 text-yellow-300 fill-current"></i>
+                            <i data-lucide="tag" class="w-8 h-8 text-yellow-300 fill-current"></i>
+                        </div>
+                        <h4 class="text-xl font-bold mb-2">🎉 مبروك! 🎉</h4>
+                        <p class="text-white/90 mb-4">لقد أضفت منتجك الأول إلى المفضلة! استخدم الكود التالي للحصول على خصم خاص:</p>
+                        <div class="bg-white/20 p-3 rounded-lg mb-4">
+                            <p class="text-2xl font-black tracking-widest">FAV15</p>
+                            <p class="text-sm opacity-90">خصم 15% على أول شراء من المفضلة</p>
+                        </div>
+                        <button class="ad-action-btn" onclick="window.copyDiscountCode()">
+                            <i data-lucide="copy" class="w-5 h-5"></i>
+                            نسخ الكود
+                        </button>
+                    </div>`;
+            }
+
+            html += `<div class="p-6"><div class="grid grid-cols-1 sm:grid-cols-2 gap-6">`;
+            
+            html += myFavorites.map(favorite => {
+                let product = window.state.products.find(p => p.id === favorite.productId);
+                
+                if (!product) {
+                     product = {
+                        name: favorite.productName || 'منتج غير متاح',
+                        price: favorite.productPrice || 0,
+                        imageUrl: favorite.productImage || 'https://placehold.co/600x400/e2e8f0/64748b?text=محذوف',
+                        brand: favorite.productBrand || 'غير معروف',
+                        sellerName: favorite.sellerName || 'بائع',
+                        sellerType: favorite.sellerType || 'user',
+                        isDeleted: true
+                    };
+                }
+
+                const date = new Date(favorite.addedAt);
+                const formattedDate = date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+                
+                return `
+                <div class="favorite-card rounded-xl overflow-hidden border border-gray-100 shadow-md h-full relative ${product.isDeleted ? 'opacity-70 grayscale' : ''}">
+                    <div class="relative">
+                        <img src="${product.imageUrl}" class="w-full h-48 object-cover" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=صورة+المنتج'">
+                        <button onclick="window.removeFromFavorites('${favorite.id}', '${favorite.productId}')" class="absolute top-3 left-3 bg-white hover:bg-red-100 text-red-500 p-2 rounded-full shadow-lg transition-all transform hover:scale-110">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                        <div class="absolute top-3 right-3 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded">${product.price.toFixed(2)} د.أ</div>
+                    </div>
+                    <div class="p-4 flex flex-col h-[calc(100%-12rem)]">
+                        <div class="mb-3">
+                            <span class="text-xs text-indigo-600 font-bold">${product.brand}</span>
+                            <h4 class="font-bold text-gray-900 text-lg leading-tight mt-1 line-clamp-2">${product.name} ${product.isDeleted ? '(غير متوفر)' : ''}</h4>
+                        </div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-lg font-black text-gray-900">${product.price.toFixed(2)} <span class="text-sm font-normal text-gray-500">د.أ</span></span>
+                            <span class="text-xs text-gray-500"><i data-lucide="calendar" class="w-3 h-3 inline ml-1"></i>${formattedDate}</span>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-100">
+                            <div class="flex gap-2">
+                                <button ${product.isDeleted ? 'disabled' : ''} onclick="window.showOrderModal('${favorite.productId}')" class="flex-1 ${product.isDeleted ? 'bg-gray-400' : 'order-now-btn'} text-white px-4 py-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                                    اطلب الآن
+                                </button>
+                                <button onclick="window.handleMashiLike('${favorite.productId}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-lg font-bold transition-colors">
+                                    <i data-lucide="heart" class="w-4 h-4 ${window.state.likedProducts.has(favorite.productId) ? 'fill-current text-red-500' : ''}"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            html += `</div></div></div>`;
+            container.innerHTML = html;
+            setTimeout(() => window.refreshIcons(), 200);
+        };
+
+        window.removeFromFavorites = async function(favoriteId, productId) {
+            if (await window.showConfirmModal("إزالة من المفضلة", "هل تريد إزالة هذا المنتج من المفضلة؟")) {
+                try {
+                    const success = await window.removeFavoriteFromFirebase(favoriteId);
+                    if (success) {
+                        window.state.favorites = window.state.favorites.filter(f => f.id !== favoriteId);
+                        window.state.likedProducts.delete(productId);
+                        window.updateFavoritesCount();
+                        window.renderFavorites();
+                        window.renderProducts();
+                        window.showToast("تمت الإزالة من المفضلة ❌", "bg-gray-700");
+                    }
+                } catch (error) { window.showToast("حدث خطأ أثناء الإزالة", "bg-red-500"); }
+            }
+        };
+
+        window.clearAllFavorites = async function() {
+            if (window.state.favorites.length === 0) return;
+            if (await window.showConfirmModal("مسح جميع المفضلة", `هل أنت متأكد من حذف جميع المنتجات (${window.state.favorites.length} منتج) من المفضلة؟`)) {
+                try {
+                    const deletePromises = window.state.favorites.map(favorite => window.removeFavoriteFromFirebase(favorite.id));
+                    await Promise.all(deletePromises);
+                    window.state.favorites = [];
+                    window.state.likedProducts.clear();
+                    window.updateFavoritesCount();
+                    window.renderFavorites();
+                    window.renderProducts();
+                    window.showToast("تم مسح جميع المفضلة بنجاح 🗑️", "bg-green-600");
+                } catch (error) { window.showToast("حدث خطأ أثناء المسح", "bg-red-500"); }
+            }
+        };
+
+        window.copyDiscountCode = function() {
+            navigator.clipboard.writeText("FAV15").then(() => { 
+                window.showToast("تم نسخ كود الخصم: FAV15 📋", "bg-green-600"); 
+            }).catch(err => { 
+                window.showToast("خطأ في نسخ الكود", "bg-red-500"); 
+            });
+        };
+
+        window.viewProductDetails = function(productId) {
+            const product = window.state.products.find(p => p.id === productId);
+            if (!product) { 
+                window.showToast("المنتج غير موجود", "bg-yellow-500"); 
+                return; 
+            }
+            window.showToast(`جاري عرض تفاصيل ${product.name}...`, "bg-blue-500");
+        };
+
+        window.checkPasswordStrength = function(password) {
+            if (!password) return 'weak';
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (password.length >= 12) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            if (score >= 5) return 'strong';
+            if (score >= 3) return 'medium';
+            return 'weak';
+        };
+
+        window.validateEmail = function(email) { 
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+            return emailRegex.test(email); 
+        };
+
+        window.validatePhoneNumber = function(phone) { 
+            const cleanPhone = phone.replace(/\D/g, ''); 
+            const phoneRegex = /^[0-9]{10,15}$/; 
+            return phoneRegex.test(cleanPhone); 
+        };
+
+        window.resendVerificationEmail = async function() {
+            if (!window.auth?.currentUser) { 
+                window.showToast("الرجاء تسجيل الدخول أولاً", "bg-yellow-600"); 
+                return; 
+            }
+            const user = window.auth.currentUser;
+            try { 
+                await user.sendEmailVerification(); 
+                window.showToast("✅ تم إرسال رابط التحقق إلى بريدك الإلكتروني", "bg-green-600"); 
+            } catch (error) { 
+                console.error('Error:', error); 
+                window.showToast("❌ فشل في إرسال رابط التحقق", "bg-red-500"); 
+            }
+        };
+
+        window.checkEmailVerificationStatus = async function() {
+            if (!window.auth?.currentUser) return false;
+            const user = window.auth.currentUser;
+            try {
+                await user.reload();
+                if (user.emailVerified) {
+                    const userDoc = await window.db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        userData.emailVerified = true;
+                        window.userData = userData;
+                        window.updateAuthUI();
+                        window.showToast("✅ تم تفعيل حسابك بنجاح!", "bg-green-600");
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) { 
+                console.error("Error checking email verification:", error);
+                return false; 
+            }
+        };
+
+        window.resetPassword = async function(email) {
+            if (!email) { 
+                email = prompt("الرجاء إدخال بريدك الإلكتروني لإعادة تعيين كلمة المرور:"); 
+                if (!email) return; 
+            }
+            if (!window.validateEmail(email)) { 
+                window.showToast("الرجاء إدخال بريد إلكتروني صحيح", "bg-red-500"); 
+                return; 
+            }
+            try { 
+                if (window.auth) { 
+                    await window.auth.sendPasswordResetEmail(email); 
+                    window.showToast("✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك", "bg-green-600"); 
+                } 
+            } catch (error) { 
+                window.showToast("❌ فشل في إرسال رابط إعادة التعيين", "bg-red-500"); 
+            }
+        };
+
+        window.switchView = function(viewName) {
+            if ((viewName === 'my_products' || viewName === 'favorites' || viewName === 'orders' || viewName === 'notifications')) {
+                if (!window.state.isLoggedIn) { 
+                    window.showToast("الرجاء تسجيل الدخول للوصول إلى هذه الصفحة", "bg-yellow-600"); 
+                    window.showLoginModal(); 
+                    return; 
+                }
+                if (window.state.isGuest && viewName === 'my_products') { 
+                    window.showToast("لا يمكنك البيع كزائر", "bg-yellow-600"); 
+                    return; 
+                }
+            }
+            window.state.currentView = viewName;
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-600', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600', 'hover:bg-gray-50');
+            });
+            const activeBtn = document.getElementById(`btn-${viewName}`);
+            if(activeBtn) { 
+                activeBtn.classList.add('active', 'bg-indigo-600', 'text-white'); 
+                activeBtn.classList.remove('bg-white', 'text-gray-600', 'hover:bg-gray-50'); 
+            }
+            document.getElementById('store-view').classList.toggle('hidden', viewName !== 'store');
+            document.getElementById('seller-view').classList.toggle('hidden', viewName !== 'my_products');
+            document.getElementById('orders-view').classList.toggle('hidden', viewName !== 'orders');
+            document.getElementById('favorites-view').classList.toggle('hidden', viewName !== 'favorites');
+            document.getElementById('notifications-view').classList.toggle('hidden', viewName !== 'notifications');
+            document.getElementById('safety-tip').classList.toggle('hidden', viewName !== 'my_products');
+            
+            if (viewName === 'store' || viewName === 'my_products') { 
+                window.renderProducts(); 
+            } else if (viewName === 'favorites') { 
+                window.renderFavorites(); 
+            } else if (viewName === 'orders') {
+                window.renderOrders();
+            } else if (viewName === 'notifications') {
+                window.renderNotifications();
+            }
+            setTimeout(() => { window.refreshIcons(); }, 300);
+        };
+
+        window.showLoginModal = function() {
+            const modal = document.getElementById('login-modal');
+            if (modal) { 
+                modal.classList.remove('hidden'); 
+                document.body.style.overflow = 'hidden'; 
+                // إعادة تعيين حالة النماذج
+                window.state.showSignupForm = false;
+                document.getElementById('login-form-container').classList.remove('hidden');
+                document.getElementById('signup-form-container').classList.remove('active');
+                
+                // إعادة تعيين التمرير إلى الأعلى عند فتح المودال
+                const signupScrollable = document.querySelector('.signup-scrollable');
+                if (signupScrollable) {
+                    signupScrollable.scrollTop = 0;
+                }
+
+                // إعادة تعيين حقول إنشاء الحساب
+                const signupForm = document.getElementById('signup-form');
+                if (signupForm) {
+                    signupForm.reset();
+                    // إعادة تعيين جميع رسائل الخطأ
+                    document.querySelectorAll('.field-error, .field-success').forEach(el => el.remove());
+                    const strengthBar = document.getElementById('password-strength-bar');
+                    if (strengthBar) {
+                        strengthBar.style.width = '0%';
+                        strengthBar.className = 'password-strength-bar';
+                    }
+                }
+            }
+        };
+
+        window.hideLoginModal = function() {
+            const modal = document.getElementById('login-modal');
+            if (modal) { 
+                modal.classList.add('hidden'); 
+                document.body.style.overflow = 'auto'; 
+            }
+        };
+
+        window.toggleModal = function() {
+            const modal = document.getElementById('add-modal');
+            if (!modal) return;
+            if (modal.classList.contains('hidden')) {
+                if (!window.state.isLoggedIn) { 
+                    window.showToast("الرجاء تسجيل الدخول أولاً", "bg-yellow-600"); 
+                    window.showLoginModal(); 
+                    return; 
+                }
+                if (window.state.isGuest) { 
+                    window.showToast("لا يمكنك نشر إعلانات كزائر. الرجاء إنشاء حساب", "bg-yellow-600"); 
+                    window.showLoginModal(); 
+                    return; 
+                }
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => window.refreshIcons(), 200);
+            } else {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        };
+
+        window.updatePrice = function(input) {
+            const price = parseFloat(input.value) || 0;
+            const calcPrice = document.getElementById('calc-price');
+            if (calcPrice) calcPrice.textContent = price.toFixed(2);
+        };
+
+        window.handleFileSelect = function(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview-image');
+            const placeholder = document.getElementById('upload-placeholder');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (preview) { 
+                        preview.src = e.target.result; 
+                        preview.classList.remove('hidden'); 
+                    }
+                    if (placeholder) { 
+                        placeholder.classList.add('hidden'); 
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                if (preview) preview.classList.add('hidden');
+                if (placeholder) placeholder.classList.remove('hidden');
+            }
+        };
+
+        window.selectAccountType = function(type) {
+            document.querySelectorAll('.account-type-card').forEach(card => {
+                card.classList.remove('selected', 'border-indigo-500', 'bg-indigo-50');
+                card.classList.add('border-gray-200', 'bg-white');
+            });
+            const selectedCard = document.querySelector(`[data-account-type="${type}"]`);
+            if (selectedCard) { 
+                selectedCard.classList.add('selected', 'border-indigo-500', 'bg-indigo-50'); 
+                selectedCard.classList.remove('border-gray-200', 'bg-white'); 
+            }
+            const form = document.getElementById('signup-form');
+            if (form) form.dataset.type = type;
+            updateFormForAccountType(type);
+        };
+
+        function updateFormForAccountType(type) {
+            const formTitle = document.getElementById('form-title');
+            const submitBtn = document.getElementById('signup-submit-btn');
+            const nameLabel = document.getElementById('name-label');
+            const nameInput = document.getElementById('display-name-input');
+            const phoneField = document.getElementById('phone-field');
+            const instagramField = document.getElementById('instagram-field');
+            if (type === 'user') {
+                if (formTitle) formTitle.textContent = 'إنشاء حساب مستخدم جديد';
+                if (submitBtn) submitBtn.innerHTML = '<i data-lucide="user-plus" class="w-5 h-5"></i><span>إنشاء حساب مستخدم</span>';
+                if (nameLabel) nameLabel.textContent = 'اسمك الكامل';
+                if (nameInput) nameInput.placeholder = 'أحمد محمد';
+                if (phoneField) phoneField.classList.remove('hidden');
+                if (instagramField) instagramField.classList.add('hidden');
+            } else if (type === 'store') {
+                if (formTitle) formTitle.textContent = 'إنشاء حساب متجر جديد';
+                if (submitBtn) submitBtn.innerHTML = '<i data-lucide="store" class="w-5 h-5"></i><span>إنشاء حساب متجر</span>';
+                if (nameLabel) nameLabel.textContent = 'اسم المتجر';
+                if (nameInput) nameInput.placeholder = 'متجر الأزياء';
+                if (phoneField) phoneField.classList.remove('hidden');
+                if (instagramField) instagramField.classList.remove('hidden');
+            }
+            window.refreshIcons();
+        }
+
+        // دالة الدخول كزائر المحسنة - مع ريفريش تلقائي وتحديث كامل للواجهة
+        window.continueAsGuest = async function() {
+            window.state.isLoggedIn = true;
+            window.state.isGuest = true;
+            window.state.userType = 'guest';
+            window.userId = 'guest-' + Date.now();
+            window.userData = { displayName: 'زائر', type: 'guest', phoneNumber: '', instagramUsername: '' };
+            
+            // تحديث واجهة المستخدم بالكامل
+            window.updateAuthUI();
+            window.updateFavoritesCount();
+            window.updateNotificationsBadge();
+            window.updateOrdersBadge();
+            
+            // التوجيه إلى صفحة المتجر الرئيسية
+            window.switchView('store');
+            
+            // إخفاء نافذة تسجيل الدخول
+            window.hideLoginModal();
+            
+            // عرض رسالة ترحيب
+            window.showToast("مرحباً بك كزائر! يمكنك التسوق ولكن لا يمكنك البيع", "bg-blue-600");
+            
+            // تحديث الأيقونات
+            setTimeout(() => {
+                window.refreshIcons();
+            }, 100);
+            
+            // ريفريش تلقائي بعد الدخول كزائر (اختياري)
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        };
+
+        window.showSignupForm = function() {
+            window.state.showSignupForm = true;
+            document.getElementById('login-form-container').classList.add('hidden');
+            document.getElementById('signup-form-container').classList.add('active');
+            
+            // إعادة تعيين التمرير إلى الأعلى عند فتح نموذج إنشاء الحساب
+            setTimeout(() => {
+                const signupScrollable = document.querySelector('.signup-scrollable');
+                if (signupScrollable) {
+                    signupScrollable.scrollTop = 0;
+                }
+            }, 100);
+        };
+
+        window.showLoginForm = function() {
+            window.state.showSignupForm = false;
+            document.getElementById('login-form-container').classList.remove('hidden');
+            document.getElementById('signup-form-container').classList.remove('active');
+        };
+
+        // دالة تبديل إظهار/إخفاء كلمة المرور
+        window.togglePasswordVisibility = function(button) {
+            const input = button.previousElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            
+            // تحديث الأيقونة
+            if (window.lucide && window.lucide.createIcons) {
+                window.lucide.createIcons();
+            }
+        };
+
+        // دوال التحقق الفوري لنموذج إنشاء الحساب - المعدلة
+        window.validateSignupField = function(fieldName, value) {
+            let isValid = false;
+            let message = '';
+            
+            switch(fieldName) {
+                case 'displayName':
+                    isValid = value.trim().length >= 3;
+                    message = isValid ? '✅ اسم صحيح' : '❌ الاسم يجب أن يكون 3 أحرف على الأقل';
+                    break;
+                case 'email':
+                    isValid = window.validateEmail(value);
+                    message = isValid ? '✅ البريد الإلكتروني صحيح' : '❌ البريد الإلكتروني غير صحيح';
+                    break;
+                case 'phoneNumber':
+                    isValid = window.validatePhoneNumber(value);
+                    message = isValid ? '✅ رقم الهاتف صحيح' : '❌ رقم الهاتف يجب أن يكون 10-15 رقم';
+                    break;
+                case 'password':
+                    const strength = window.checkPasswordStrength(value);
+                    isValid = value.length >= 6;
+                    message = isValid ? `قوة كلمة المرور: ${strength === 'strong' ? 'قوية' : strength === 'medium' ? 'متوسطة' : 'ضعيفة'}` : '❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                    break;
+                case 'confirmPassword':
+                    const password = document.querySelector('[name="password"]').value;
+                    isValid = value === password && value.length >= 6; // ✅ المقارنة الصحيحة مع التأكد من وجود قيمة
+                    message = isValid ? '✅ كلمة المرور متطابقة' : '❌ كلمة المرور غير متطابقة';
+                    break;
+            }
+            
+            return { isValid, message };
+        };
+
+        window.updateSignupFieldValidation = function(input) {
+            const fieldName = input.name;
+            const value = input.value;
+            const { isValid, message } = window.validateSignupField(fieldName, value);
+            
+            // إزالة أي رسالة سابقة
+            const existingMessage = input.parentElement.parentElement.querySelector('.field-error, .field-success');
+            if (existingMessage) existingMessage.remove();
+            
+            // إضافة الرسالة الجديدة
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isValid ? 'field-success' : 'field-error';
+            messageDiv.innerHTML = `<i data-lucide="${isValid ? 'check-circle' : 'alert-circle'}" class="w-3 h-3"></i> ${message}`;
+            input.parentElement.parentElement.appendChild(messageDiv);
+            
+            // تحديث مظهر الحقل
+            if (isValid) {
+                input.classList.add('border-green-500', 'bg-green-50');
+                input.classList.remove('border-red-500', 'bg-red-50');
+            } else if (value.length > 0) {
+                input.classList.add('border-red-500', 'bg-red-50');
+                input.classList.remove('border-green-500', 'bg-green-50');
+            } else {
+                input.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+            }
+            
+            // تحديث مؤشر قوة كلمة المرور
+            if (fieldName === 'password') {
+                const strength = window.checkPasswordStrength(value);
+                const strengthBar = document.getElementById('password-strength-bar');
+                if (strengthBar) {
+                    let width = '0%';
+                    let strengthClass = '';
+                    if (value.length >= 6) {
+                        if (strength === 'weak') {
+                            width = '25%';
+                            strengthClass = 'strength-weak';
+                        } else if (strength === 'medium') {
+                            width = '50%';
+                            strengthClass = 'strength-medium';
+                        } else if (strength === 'strong') {
+                            width = '100%';
+                            strengthClass = 'strength-strong';
+                        }
+                    }
+                    strengthBar.style.width = width;
+                    strengthBar.className = `password-strength-bar ${strengthClass}`;
+                }
+            }
+            
+            // التحقق من صحة جميع الحقول لتمكين زر الإرسال
+            window.checkSignupFormValidity();
+            
+            // تحديث الأيقونات
+            setTimeout(() => window.refreshIcons(), 50);
+        };
+
+        window.checkSignupFormValidity = function() {
+            const form = document.getElementById('signup-form');
+            if (!form) return;
+            
+            const inputs = form.querySelectorAll('input[required], input[name="phoneNumber"]');
+            let allValid = true;
+            
+            inputs.forEach(input => {
+                if (input.name === 'instagramUsername' && input.closest('#instagram-field')?.classList.contains('hidden')) {
+                    return; // تجاهل حقل الإنستغرام إذا كان مخفياً
+                }
+                const value = input.value;
+                const { isValid } = window.validateSignupField(input.name, value);
+                if (!isValid && value.length > 0) {
+                    allValid = false;
+                }
+                if (input.required && !value) {
+                    allValid = false;
+                }
+            });
+            
+            // التحقق من تطابق كلمة المرور
+            const password = form.querySelector('[name="password"]').value;
+            const confirmPassword = form.querySelector('[name="confirmPassword"]').value;
+            if (password !== confirmPassword || password.length < 6 || confirmPassword.length < 6) {
+                allValid = false;
+            }
+            
+            const submitBtn = document.getElementById('signup-submit-btn');
+            if (submitBtn) {
+                submitBtn.disabled = !allValid;
+                if (!allValid) {
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        };
+
+        // دالة تسجيل الدخول المحسنة - رسائل خطأ واضحة
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const email = form.email.value.trim();
+            const password = form.password.value.trim();
+            
+            if (!email || !password) {
+                window.showToast("الرجاء إدخال البريد الإلكتروني وكلمة المرور", "bg-red-500");
+                return;
+            }
+            
+            const loginBtn = form.querySelector('button[type="submit"]');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>جاري تسجيل الدخول...</span>';
+            loginBtn.disabled = true;
+            
+            try {
+                if (!window.firebaseInitialized) {
+                    const initialized = window.initializeFirebase();
+                    if (!initialized) throw new Error('Failed to initialize Firebase');
+                }
+                
+                // تسجيل الدخول
+                const userCredential = await window.auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // جلب بيانات المستخدم مباشرة بعد تسجيل الدخول
+                try {
+                    const userDoc = await window.db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        window.userData = userDoc.data();
+                        window.userData.emailVerified = user.emailVerified;
+                        window.userId = user.uid;
+                        window.state.isLoggedIn = true;
+                        window.state.isGuest = false;
+                        window.state.userType = window.userData.type;
+                        
+                        // تحديث واجهة المستخدم فوراً
+                        window.updateAuthUI();
+                        
+                        // تحميل المفضلة
+                        await window.loadUserFavorites();
+                        
+                        // تحميل الطلبات
+                        await window.loadMyOrders();
+                        
+                        // بدء الاستماع للإشعارات
+                        window.startNotificationsListener();
+                        
+                        // تحديث المنتجات المعروضة
+                        window.renderProducts();
+                        
+                        // تحديث الأيقونات
+                        setTimeout(() => window.refreshIcons(), 100);
+                        
+                        // ✅ ريفريش تلقائي للصفحة بعد تسجيل الدخول
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    }
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                }
+                
+                window.hideLoginModal();
+                window.showToast("✅ تم تسجيل الدخول بنجاح!", "bg-green-600");
+
+            } catch (error) {
+                console.error('❌ خطأ في تسجيل الدخول:', error);
+                let errorMessage = "خطأ في تسجيل الدخول";
+                
+                // رسائل خطأ محددة وواضحة
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = "❌ هذا البريد الإلكتروني غير مسجل. الرجاء إنشاء حساب جديد.";
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = "❌ كلمة المرور غير صحيحة. الرجاء المحاولة مرة أخرى.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "❌ البريد الإلكتروني غير صحيح. الرجاء إدخال بريد إلكتروني صالح.";
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMessage = "❌ بيانات الدخول غير صحيحة. الرجاء التحقق من البريد الإلكتروني وكلمة المرور.";
+                        break;
+                    default:
+                        errorMessage = "❌ حدث خطأ: " + error.message;
+                }
+                
+                window.showToast(errorMessage, "bg-red-500");
+            } finally {
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+                window.refreshIcons();
+            }
+        };
+
+        // دالة إنشاء حساب محسنة - مع تحسين التحقق من تطابق كلمة المرور
+        window.handleSignup = async function(e) {
+            e.preventDefault();
+            
+            // التحقق النهائي من صحة جميع الحقول
+            const form = e.target;
+            const inputs = form.querySelectorAll('input[required], input[name="phoneNumber"]');
+            let allValid = true;
+            
+            inputs.forEach(input => {
+                if (input.name === 'instagramUsername' && input.closest('#instagram-field')?.classList.contains('hidden')) {
+                    return;
+                }
+                const value = input.value;
+                const { isValid } = window.validateSignupField(input.name, value);
+                if (!isValid || (input.required && !value)) {
+                    allValid = false;
+                }
+            });
+            
+            // التحقق من تطابق كلمة المرور
+            const password = form.querySelector('[name="password"]').value;
+            const confirmPassword = form.querySelector('[name="confirmPassword"]').value;
+            
+            if (password !== confirmPassword) {
+                window.showToast("❌ كلمة المرور غير متطابقة", "bg-red-500");
+                return;
+            }
+            
+            if (password.length < 6) {
+                window.showToast("❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل", "bg-red-500");
+                return;
+            }
+            
+            if (!allValid) {
+                window.showToast("❌ الرجاء التأكد من صحة جميع الحقول", "bg-red-500");
+                return;
+            }
+            
+            const userType = form.dataset.type || 'user';
+            const displayName = form.displayName.value.trim();
+            const email = form.email.value.trim();
+            const phoneNumber = form.phoneNumber?.value.trim() || '';
+            const instagramUsername = form.instagramUsername?.value.trim() || '';
+
+            const submitBtn = document.getElementById('signup-submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>جاري إنشاء الحساب...</span>';
+            submitBtn.disabled = true;
+
+            try {
+                if (!window.firebaseInitialized) {
+                    const initialized = window.initializeFirebase();
+                    if (!initialized) throw new Error('Failed to initialize Firebase');
+                }
+                
+                // إنشاء الحساب
+                const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // إرسال بريد التحقق
+                await user.sendEmailVerification();
+                
+                // حفظ بيانات المستخدم في Firestore
+                const userData = {
+                    type: userType, 
+                    displayName, 
+                    email, 
+                    phoneNumber, 
+                    instagramUsername,
+                    emailVerified: false, 
+                    createdAt: new Date().toISOString()
+                };
+                
+                await window.db.collection('users').doc(user.uid).set(userData);
+                
+                // ✅ المستخدم مسجل الدخول بالفعل من createUserWithEmailAndPassword
+                
+                // تحديث بيانات المستخدم في الواجهة
+                window.userData = userData;
+                window.userData.emailVerified = user.emailVerified;
+                window.userId = user.uid;
+                window.state.isLoggedIn = true;
+                window.state.isGuest = false;
+                window.state.userType = userType;
+                
+                // تحديث واجهة المستخدم
+                window.updateAuthUI();
+                
+                // تحميل المفضلة (فارغة حالياً)
+                await window.loadUserFavorites();
+                
+                // تحميل الطلبات (فارغة حالياً)
+                await window.loadMyOrders();
+                
+                // بدء الاستماع للإشعارات
+                window.startNotificationsListener();
+                
+                // تحديث المنتجات
+                window.renderProducts();
+                
+                // إغلاق نافذة تسجيل الدخول
+                window.hideLoginModal();
+                
+                // عرض رسالة نجاح
+                window.showToast(`✅ تم إنشاء الحساب بنجاح! مرحباً بك في ماشي`, "bg-green-600");
+                
+                // ✅ ريفريش تلقائي للصفحة بعد إنشاء الحساب
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+
+            } catch (error) {
+                console.error('❌ خطأ في إنشاء الحساب:', error);
+                let errorMessage = "حدث خطأ في إنشاء الحساب";
+                
+                // رسائل خطأ محددة وواضحة
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = "❌ هذا البريد الإلكتروني مسجل مسبقاً. الرجاء استخدام بريد آخر أو تسجيل الدخول.";
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = "❌ البريد الإلكتروني غير صحيح";
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = "❌ كلمة المرور ضعيفة جداً. الرجاء استخدام كلمة مرور أقوى.";
+                        break;
+                    default:
+                        errorMessage = "❌ حدث خطأ: " + error.message;
+                }
+                
+                window.showToast(errorMessage, "bg-red-500");
+                
+                // إعادة تمكين زر الإرسال
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                window.refreshIcons();
+            }
+        };
+
+        window.handleLogout = async function() {
+            if (await window.showConfirmModal("تسجيل الخروج", "هل أنت متأكد من تسجيل الخروج؟")) {
+                window.state.isLoggedIn = false;
+                window.state.userType = null;
+                window.state.isGuest = false;
+                window.userId = null;
+                window.userData = null;
+                window.state.favorites = [];
+                window.state.likedProducts.clear();
+                window.state.showFavoriteAd = false;
+                window.state.myOrders = [];
+                window.state.newOrdersCount = 0;
+                window.state.notifications = [];
+                window.state.unreadNotificationsCount = 0;
+                
+                // إيقاف الاستماع للإشعارات
+                if (window.state.notificationsListener) {
+                    window.state.notificationsListener();
+                    window.state.notificationsListener = null;
+                }
+                
+                if (window.auth) { 
+                    try { 
+                        await window.auth.signOut(); 
+                    } catch (error) { 
+                        console.error(error); 
+                    } 
+                }
+                
+                window.updateAuthUI();
+                window.updateFavoritesCount();
+                window.updateNotificationsBadge();
+                window.switchView('store');
+                window.renderProducts();
+                window.showToast("تم تسجيل الخروج بنجاح", "bg-gray-700");
+                
+                // ريفريش تلقائي بعد تسجيل الخروج
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            }
+        };
+
+        window.updateAuthUI = function() {
+            const userAvatar = document.getElementById('user-avatar');
+            const userName = document.getElementById('user-name');
+            const userStatus = document.getElementById('user-status');
+            const authButtons = document.getElementById('auth-buttons');
+            const userMenu = document.getElementById('user-menu');
+            const guestIndicator = document.getElementById('guest-indicator');
+            
+            if (window.state.isLoggedIn) {
+                if (window.state.isGuest) {
+                    if (userAvatar) userAvatar.innerHTML = `<div class="w-10 h-10 rounded-full guest-avatar flex items-center justify-center text-white font-bold shadow-md relative"><i data-lucide="user" class="w-5 h-5"></i><div class="active-indicator"></div></div>`;
+                    if (userName) userName.textContent = 'زائر';
+                    if (userStatus) userStatus.innerHTML = `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">زائر</span>`;
+                    if (guestIndicator) guestIndicator.classList.remove('hidden');
+                } else if (window.userData) {
+                    const avatarClass = window.state.userType === 'store' ? 'store-avatar' : 'user-avatar';
+                    const displayName = window.userData.displayName || 'مستخدم';
+                    const initials = displayName.charAt(0).toUpperCase();
+                    if (userAvatar) userAvatar.innerHTML = `<div class="w-10 h-10 rounded-full ${avatarClass} flex items-center justify-center text-white font-bold shadow-md relative">${initials}<div class="active-indicator"></div></div>`;
+                    if (userName) userName.textContent = displayName;
+                    if (userStatus) {
+                        if (window.userData.emailVerified === false) {
+                            userStatus.innerHTML = `<div class="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold"><i data-lucide="alert-circle" class="w-3 h-3"></i><span>غير مفعّل</span><button onclick="window.resendVerificationEmail()" class="text-yellow-600 hover:text-yellow-800 underline text-xs mr-1">إعادة</button></div>`;
+                        } else {
+                            const statusClass = window.state.userType === 'store' ? 'bg-pink-100 text-pink-700' : 'bg-indigo-100 text-indigo-700';
+                            const statusText = window.state.userType === 'store' ? 'متجر' : 'مستخدم';
+                            userStatus.innerHTML = `<span class="${statusClass} px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i>${statusText}</span>`;
+                        }
+                    }
+                    if (guestIndicator) guestIndicator.classList.add('hidden');
+                }
+                if (authButtons) authButtons.classList.add('hidden');
+                if (userMenu) userMenu.classList.remove('hidden');
+                
+                // تحديث شارات القائمة المنسدلة
+                const ordersDropdownItem = document.querySelector('[onclick="window.switchView(\'orders\')"]');
+                if (ordersDropdownItem) {
+                    let badge = ordersDropdownItem.querySelector('#orders-dropdown-badge');
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.id = 'orders-dropdown-badge';
+                        badge.className = 'bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full hidden';
+                        ordersDropdownItem.querySelector('div').appendChild(badge);
+                    }
+                    badge.textContent = window.state.newOrdersCount;
+                    badge.classList.toggle('hidden', window.state.newOrdersCount === 0);
+                }
+                
+                // تحديث شارة الإشعارات في القائمة المنسدلة
+                const notificationsDropdownItem = document.querySelector('[onclick="window.switchView(\'notifications\')"]');
+                if (notificationsDropdownItem) {
+                    let badge = notificationsDropdownItem.querySelector('#notifications-dropdown-badge');
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.id = 'notifications-dropdown-badge';
+                        badge.className = 'bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full hidden';
+                        notificationsDropdownItem.querySelector('div').appendChild(badge);
+                    }
+                    badge.textContent = window.state.unreadNotificationsCount;
+                    badge.classList.toggle('hidden', window.state.unreadNotificationsCount === 0);
+                }
+            } else {
+                if (authButtons) authButtons.classList.remove('hidden');
+                if (userMenu) userMenu.classList.add('hidden');
+                if (userAvatar) userAvatar.innerHTML = `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"><i data-lucide="user" class="w-5 h-5"></i></div>`;
+                if (userName) userName.textContent = 'زائر';
+                if (userStatus) userStatus.innerHTML = `<span class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-xs">غير مسجل</span>`;
+                if (guestIndicator) guestIndicator.classList.add('hidden');
+            }
+            window.updateMyProductsButton();
+            window.refreshIcons();
+        };
+
+        window.updateMyProductsButton = function() {
+            const myProductsBtn = document.getElementById('btn-my_products');
+            if (!myProductsBtn) return;
+            if (window.state.isLoggedIn && !window.state.isGuest) {
+                myProductsBtn.classList.add('my-products-btn');
+                myProductsBtn.classList.remove('bg-white', 'text-gray-600');
+                let badge = document.getElementById('my-products-count');
+                if (!badge) { 
+                    badge = document.createElement('span'); 
+                    badge.id = 'my-products-count'; 
+                    badge.className = 'count-badge'; 
+                    myProductsBtn.appendChild(badge); 
+                }
+                badge.textContent = window.state.myProductsCount || 0;
+                badge.classList.toggle('hidden', (window.state.myProductsCount || 0) === 0);
+            } else {
+                myProductsBtn.classList.remove('my-products-btn');
+                myProductsBtn.classList.add('bg-white', 'text-gray-600');
+                const badge = document.getElementById('my-products-count');
+                if (badge) badge.remove();
+            }
+        };
+
+        window.renderProducts = function() {
+            const isStore = window.state.currentView === 'store';
+            const containerId = isStore ? 'products-grid' : 'my-products-grid';
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const items = isStore ? window.state.products : window.state.products.filter(p => p.sellerId === window.userId);
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) pageTitle.textContent = isStore ? 'أحدث العروض' : 'إعلاناتي';
+
+            if (items.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300"><i data-lucide="${isStore ? 'shopping-bag' : 'tag'}" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i><p class="text-gray-500 text-lg">لا توجد عناصر لعرضها حالياً. ${!isStore ? 'اضغط "إضافة إعلان" لنشر منتجك الأول.' : ''}</p></div>`;
+                setTimeout(() => window.refreshIcons(), 100);
+                return;
+            }
+
+            container.innerHTML = items.map(p => {
+                const isMine = p.sellerId === window.userId;
+                const price = p.price || 0;
+                
+                const isLikedByMe = window.state.likedProducts.has(p.id);
+                const likeBtnClass = isLikedByMe ? "btn-mashi-active favorite-heart-btn active" : "btn-mashi-inactive favorite-heart-btn";
+                const likeBtnIcon = isLikedByMe ? '<i data-lucide="heart" class="w-4 h-4 fill-current text-red-500"></i>' : '<i data-lucide="heart" class="w-4 h-4"></i>';
+                
+                let contactButtons = '';
+                const phoneNumber = p.contactPhone || p.sellerPhone || '';
+                const instagramUsername = p.contactInstagram || p.sellerInstagram || '';
+                const hasPhoneContact = phoneNumber && phoneNumber.trim() !== '';
+                const hasInstagramContact = instagramUsername && instagramUsername.trim() !== '';
+                
+                if (!isMine && (hasPhoneContact || hasInstagramContact)) {
+                    const cleanPhone = phoneNumber.replace(/\D/g, '');
+                    contactButtons = '<div class="seller-info"><p class="text-xs text-gray-600 mb-2 font-bold">تواصل مع البائع:</p><div class="contact-buttons-container">';
+                    if (hasPhoneContact) contactButtons += `<a href="https://wa.me/${cleanPhone}" target="_blank" class="contact-btn whatsapp-btn px-3 py-2 text-sm flex items-center justify-center gap-2 flex-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span>واتساب</span></a>`;
+                    if (hasInstagramContact) contactButtons += `<a href="https://instagram.com/${instagramUsername.replace('@', '')}" target="_blank" class="contact-btn instagram-btn px-3 py-2 text-sm flex items-center justify-center gap-2 flex-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg><span>إنستغرام</span></a>`;
+                    contactButtons += '</div></div>';
+                }
+
+                const sellerBadge = p.sellerType === 'store' ? '<span class="seller-badge store-badge">متجر</span>' : '<span class="seller-badge user-badge">مستخدم</span>';
+                
+                // زر الطلب الفوري يظهر فقط إذا لم تكن أنت البائع
+                let actionButton = isMine
+                    ? `<button onclick="window.deleteProductHandler('${p.id}')" class="text-red-500 hover:bg-red-50 p-3 rounded-lg flex-1 border border-red-100">حذف الإعلان</button>`
+                    : `<button onclick="window.showOrderModal('${p.id}')" class="order-now-btn px-4 py-3 rounded-xl font-bold shadow-lg flex-1 flex items-center justify-center gap-2">
+                          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                          <span>اطلب الآن</span>
+                       </button>`;
+
+                return `
+                <div class="product-card bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col h-full ${isMine ? 'my-product shadow-lg' : 'shadow-md'}">
+                    <div class="product-image-container">
+                        <img src="${p.imageUrl}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/e2e8f0/64748b?text=صورة+المنتج'">
+                        <span class="absolute top-3 left-3 bg-gray-900/80 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${price.toFixed(2)} د.أ</span>
+                    </div>
+                    <div class="product-content">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex-1"><p class="text-xs text-indigo-600 font-bold mb-1">${p.brand || 'عام'}</p><h3 class="text-lg font-bold text-gray-900 leading-tight mb-2 truncate-mobile">${p.name}</h3></div>
+                            ${sellerBadge}
+                        </div>
+                        <p class="text-gray-500 text-sm mt-2 mb-3 product-description truncate-mobile">${p.desc}</p>
+                        ${contactButtons}
+                        <div class="product-footer">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-2xl font-black text-gray-900 price-tag">${price.toFixed(2)} <span class="text-sm font-normal text-gray-500">د.أ</span></span>
+                                <div class="flex items-center gap-2">
+                                    ${actionButton}
+                                    <button onclick="window.handleMashiLike('${p.id}')" class="${likeBtnClass} like-btn px-3 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border border-transparent hover:shadow-md">
+                                        ${likeBtnIcon}
+                                        <span class="text-xs flex items-center gap-1">ماشي</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            setTimeout(() => window.refreshIcons(), 300);
+        };
+
+        window.renderOrders = function() {
+            const container = document.getElementById('orders-container');
+            if (!container) return;
+            
+            let filteredOrders = window.state.myOrders;
+            
+            if (window.state.ordersTab === 'pending') {
+                filteredOrders = window.state.myOrders.filter(order => 
+                    order.orderStatus === 'جديد' || order.orderStatus === 'قيد الانتظار'
+                );
+            } else if (window.state.ordersTab === 'completed') {
+                filteredOrders = window.state.myOrders.filter(order => order.orderStatus === 'مكتمل');
+            } else if (window.state.ordersTab === 'cancelled') {
+                filteredOrders = window.state.myOrders.filter(order => order.orderStatus === 'ملغي');
+            }
+            
+            if (filteredOrders.length === 0) {
+                let message = 'لا توجد طلبات حالياً';
+                if (window.state.ordersTab === 'pending') message = 'لا توجد طلبات قيد الانتظار';
+                else if (window.state.ordersTab === 'completed') message = 'لا توجد طلبات مكتملة';
+                else if (window.state.ordersTab === 'cancelled') message = 'لا توجد طلبات ملغية';
+                
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+                        <i data-lucide="shopping-cart" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-700 mb-2">${message}</h3>
+                        <p class="text-gray-500 mb-8 max-w-md mx-auto">ستظهر هنا جميع الطلبات الواردة على منتجاتك</p>
+                        <button onclick="window.switchView('store')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-all">
+                            تصفح المنتجات
+                        </button>
+                    </div>`;
+                setTimeout(() => window.refreshIcons(), 100);
+                return;
+            }
+            
+            container.innerHTML = filteredOrders.map(order => {
+                const date = new Date(order.createdAt);
+                const formattedDate = date.toLocaleDateString('ar-SA', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let statusClass = 'order-status-new';
+                let statusIcon = 'clock';
+                
+                if (order.orderStatus === 'مكتمل') {
+                    statusClass = 'order-status-completed';
+                    statusIcon = 'check-circle';
+                } else if (order.orderStatus === 'ملغي') {
+                    statusClass = 'order-status-cancelled';
+                    statusIcon = 'x-circle';
+                } else if (order.orderStatus === 'قيد الانتظار') {
+                    statusClass = 'order-status-pending';
+                    statusIcon = 'clock';
+                }
+                
+                let actions = '';
+                if (order.orderStatus === 'جديد' || order.orderStatus === 'قيد الانتظار') {
+                    actions = `
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="window.updateOrderStatus('${order.id}', 'مكتمل')" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold text-sm transition-colors">
+                                <i data-lucide="check" class="w-4 h-4 inline ml-1"></i>
+                                إتمام
+                            </button>
+                            <button onclick="window.updateOrderStatus('${order.id}', 'ملغي')" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold text-sm transition-colors">
+                                <i data-lucide="x" class="w-4 h-4 inline ml-1"></i>
+                                إلغاء
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                return `
+                <div class="order-card" data-order-id="${order.id}">
+                    <div class="p-5">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <h4 class="font-bold text-gray-900 text-lg truncate-mobile">${order.productName}</h4>
+                                    <span class="${statusClass} order-status-badge">
+                                        <i data-lucide="${statusIcon}" class="w-3 h-3"></i>
+                                        ${order.orderStatus}
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-1"><i data-lucide="user" class="w-3 h-3 inline ml-1"></i> ${order.customerName}</p>
+                                <p class="text-gray-600 text-sm mb-1"><i data-lucide="phone" class="w-3 h-3 inline ml-1"></i> ${order.customerPhone}</p>
+                                <p class="text-gray-500 text-xs mt-2"><i data-lucide="calendar" class="w-3 h-3 inline ml-1"></i> ${formattedDate}</p>
+                            </div>
+                            <div class="ml-4">
+                                <div class="bg-gray-100 p-3 rounded-lg text-center">
+                                    <p class="text-2xl font-black text-gray-900">${order.productPrice.toFixed(2)}</p>
+                                    <p class="text-xs text-gray-500">دينار</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-100 pt-4 mt-4">
+                            <p class="text-sm text-gray-700 mb-2"><i data-lucide="map-pin" class="w-4 h-4 inline ml-1"></i> <span class="font-medium">العنوان:</span> ${order.customerAddress}</p>
+                            ${order.sizeColor ? `<p class="text-sm text-gray-700 mb-2"><i data-lucide="tag" class="w-4 h-4 inline ml-1"></i> <span class="font-medium">المقاس/اللون:</span> ${order.sizeColor}</p>` : ''}
+                            ${actions}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            setTimeout(() => window.refreshIcons(), 300);
+        };
+
+        window.deleteProductHandler = function(productId) {
+            window.showConfirmModal("تأكيد الحذف", "هل أنت متأكد من حذف هذا الإعلان نهائياً؟").then(async confirmed => {
+                if (confirmed) {
+                    try {
+                        await window.db.collection('products').doc(productId).delete();
+                        window.showToast("تم حذف المنتج من قاعدة البيانات", "bg-gray-700");
+                    } catch (error) {
+                        console.error("Error deleting product:", error);
+                        window.showToast("حدث خطأ أثناء الحذف", "bg-red-500");
+                    }
+                }
+            });
+        };
+
+        window.submitProduct = async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = form.name.value.trim();
+            const brand = form.brand.value.trim();
+            const price = parseFloat(form.price.value);
+            const contactPhone = form.contactPhone.value.trim();
+            const contactInstagram = form.contactInstagram.value.trim();
+            const desc = form.desc.value.trim();
+            const file = form.imageFile.files[0];
+            
+            if (!name || !brand || !price || !desc) { 
+                window.showToast("الرجاء ملء جميع الحقول المطلوبة", "bg-red-500"); 
+                return; 
+            }
+            if (isNaN(price) || price <= 0) { 
+                window.showToast("الرجاء إدخال سعر صحيح", "bg-red-500"); 
+                return; 
+            }
+            
+            const btn = document.getElementById('submit-btn');
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '<span>جاري الرفع...</span>';
+            btn.disabled = true;
+
+            let imageUrl = 'https://placehold.co/600x400/6366f1/ffffff?text=' + encodeURIComponent(name.substring(0, 10));
+            
+            const processUpload = async () => {
+                if (file) {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                }
+                return imageUrl;
+            };
+
+            try {
+                const finalImageUrl = await processUpload();
+                
+                const newProduct = {
+                    name, 
+                    brand, 
+                    desc, 
+                    imageUrl: finalImageUrl, 
+                    price: price,
+                    contactPhone: contactPhone || window.userData?.phoneNumber || '',
+                    contactInstagram: contactInstagram || window.userData?.instagramUsername || '',
+                    sellerId: window.userId,
+                    sellerName: window.userData?.displayName || 'مستخدم',
+                    sellerType: window.state.userType || 'user',
+                    likes: 0,
+                    createdAt: new Date().toISOString()
+                };
+
+                await window.db.collection('products').add(newProduct);
+
+                window.toggleModal();
+                window.switchView('my_products');
+                window.showToast("تم نشر الإعلان بنجاح!", "bg-green-600");
+                form.reset();
+                const previewImage = document.getElementById('preview-image');
+                const uploadPlaceholder = document.getElementById('upload-placeholder');
+                if(previewImage) previewImage.classList.add('hidden');
+                if(uploadPlaceholder) uploadPlaceholder.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Error adding product:", error);
+                window.showToast("فشل في إضافة المنتج", "bg-red-500");
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        };
+
+        window.addToCartHandler = function(productId) { 
+            window.showToast("تمت إضافة المنتج إلى السلة", "bg-green-600"); 
+        };
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20 safe-area-bottom">
+    <!-- Toast -->
+    <div id="toast" class="opacity-0 pointer-events-none transition-opacity"></div>
+    
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-white rounded-3xl shadow-2xl p-6 modal-mobile">
+            <h3 id="confirm-title" class="text-xl font-black text-gray-900 mb-3">تأكيد</h3>
+            <p id="confirm-message" class="text-gray-600 mb-6 text-sm"></p>
+            <div class="flex justify-end gap-3">
+                <button id="confirm-cancel-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors">إلغاء</button>
+                <button id="confirm-action-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-colors">تأكيد</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Modal -->
+    <div id="order-modal" class="fixed inset-0 z-[75] hidden">
+        <div class="absolute inset-0 bg-gray-900/70 backdrop-blur-sm order-modal-overlay" onclick="window.hideOrderModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden modal-mobile">
+            <div class="p-6 order-form-container">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-black text-gray-900">طلب فوري</h3>
+                    <button onclick="window.hideOrderModal()" class="bg-gray-100 hover:bg-red-100 hover:text-red-600 p-2 rounded-full transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="product-preview-card rounded-2xl p-4 mb-6">
+                    <div class="flex items-center gap-4">
+                        <img id="order-product-image" src="" class="w-20 h-20 object-cover rounded-xl" alt="صورة المنتج">
+                        <div class="flex-1">
+                            <h4 id="order-product-name" class="font-bold text-gray-900 text-lg"></h4>
+                            <div class="flex items-center justify-between mt-2">
+                                <div>
+                                    <p class="text-sm text-gray-600">الماركة: <span id="order-product-brand" class="font-bold"></span></p>
+                                    <p class="text-sm text-gray-600">البائع: <span id="order-product-seller" class="font-bold"></span></p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-2xl font-black text-green-600" id="order-product-price"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="order-form" onsubmit="window.submitOrder(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">الاسم الكامل *</label>
+                        <input type="text" name="customerName" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all input-mobile" placeholder="أحمد محمد" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">رقم الهاتف *</label>
+                        <div class="flex">
+                            <span class="bg-gray-100 border border-r-0 border-gray-200 rounded-r-xl px-3 py-3 text-gray-500 flex items-center">+</span>
+                            <input type="tel" name="customerPhone" class="w-full bg-gray-50 border border-gray-200 rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all input-mobile" placeholder="966XXXXXXXXX" required>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">سيتواصل معك البائع على هذا الرقم</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">العنوان التفصيلي *</label>
+                        <textarea name="customerAddress" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all input-mobile" placeholder="المدينة، الحي، الشارع، رقم المنزل..." required></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">المقاس / اللون (اختياري)</label>
+                        <input type="text" name="sizeColor" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all input-mobile" placeholder="مثال: L، أحمر">
+                    </div>
+                    
+                    <div class="pt-4 border-t border-gray-100">
+                        <div class="flex items-start gap-2 mb-4">
+                            <div class="bg-blue-100 p-2 rounded-lg mt-1">
+                                <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">سيتم إرسال طلبك مباشرة إلى البائع وسيتواصل معك في أقرب وقت</p>
+                                <p class="text-xs text-gray-500 mt-1">لا حاجة لتسجيل الدخول - الطلب كزائر</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button type="button" onclick="window.hideOrderModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors btn-mobile">
+                                إلغاء
+                            </button>
+                            <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition-colors btn-mobile flex items-center justify-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                إرسال الطلب
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-[80] hidden">
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-lg transition-opacity"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4 modal-overlay-mobile">
+            <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-black text-gray-900">تسجيل الدخول</h3>
+                        <button onclick="window.hideLoginModal()" class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition-colors">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- نموذج تسجيل الدخول -->
+                    <div id="login-form-container" class="login-form-container">
+                        <form onsubmit="window.handleLogin(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">البريد الإلكتروني</label>
+                                <input type="email" name="email" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all input-mobile" placeholder="example@email.com" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">كلمة المرور</label>
+                                <div class="password-input-container">
+                                    <input type="password" name="password" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all input-mobile" placeholder="••••••••" required>
+                                    <button type="button" class="password-toggle-btn" onclick="window.togglePasswordVisibility(this)">
+                                        <i data-lucide="eye" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="text-left">
+                                <button type="button" onclick="window.resetPassword()" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                                    نسيت كلمة المرور؟
+                                </button>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] flex justify-center items-center gap-2 btn-mobile">
+                                <i data-lucide="log-in" class="w-5 h-5"></i>
+                                <span>تسجيل الدخول</span>
+                            </button>
+                        </form>
+                        
+                        <div class="divider my-6">
+                            <span class="text-sm">أو</span>
+                        </div>
+                        
+                        <button onclick="window.continueAsGuest()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 btn-mobile mb-4">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                            <span>الدخول كزائر</span>
+                        </button>
+                        
+                        <div class="text-center mt-4">
+                            <p class="text-gray-600">
+                                ليس لديك حساب؟ 
+                                <span onclick="window.showSignupForm()" class="create-account-link mr-1">إنشاء حساب جديد</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- نموذج إنشاء حساب مع شريط تمرير وتحقق فوري -->
+                    <div id="signup-form-container" class="signup-form-container">
+                        <!-- تلميح التمرير -->
+                        <div class="scroll-hint">
+                            <i data-lucide="mouse-pointer" class="w-4 h-4"></i>
+                            <span>يمكنك التمرير لأسفل لرؤية جميع الحقول</span>
+                            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                        </div>
+                        
+                        <div class="signup-scrollable">
+                            <div class="text-center mb-4">
+                                <p class="text-gray-600">اختر نوع الحساب</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-6">
+                                <div class="account-type-card compact-account-type selected bg-indigo-50 border-2 border-indigo-500 rounded-xl p-4 text-center cursor-pointer" data-account-type="user" onclick="window.selectAccountType('user')">
+                                    <div class="compact-icon bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2"><i data-lucide="user" class="w-5 h-5 text-indigo-600"></i></div>
+                                    <h4 class="font-bold text-gray-900 text-sm">مستخدم</h4>
+                                </div>
+                                <div class="account-type-card compact-account-type bg-white border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer" data-account-type="store" onclick="window.selectAccountType('store')">
+                                    <div class="compact-icon bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-2"><i data-lucide="store" class="w-5 h-5 text-pink-600"></i></div>
+                                    <h4 class="font-bold text-gray-900 text-sm">متجر</h4>
+                                </div>
+                            </div>
+                            
+                            <h4 id="form-title" class="text-lg font-bold text-gray-900 mb-4">إنشاء حساب مستخدم جديد</h4>
+                            
+                            <form id="signup-form" data-type="user" onsubmit="window.handleSignup(event)" class="space-y-4">
+                                <div>
+                                    <label id="name-label" class="block text-sm font-bold text-gray-700 mb-1">اسمك الكامل</label>
+                                    <div class="password-input-container">
+                                        <input id="display-name-input" type="text" name="displayName" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition-all input-mobile" placeholder="أحمد محمد" required oninput="window.updateSignupFieldValidation(this)">
+                                    </div>
+                                </div>
+                                
+                                <div id="phone-field">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">رقم الهاتف للواتساب</label>
+                                    <div class="flex">
+                                        <span class="bg-gray-100 border border-r-0 border-gray-200 rounded-r-lg px-3 py-2.5 text-gray-500 text-sm">+</span>
+                                        <input type="tel" name="phoneNumber" class="w-full bg-gray-50 border border-gray-200 rounded-l-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition-all input-mobile" placeholder="966XXXXXXXXX" required oninput="window.updateSignupFieldValidation(this)">
+                                    </div>
+                                </div>
+                                
+                                <div id="instagram-field" class="hidden">
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">صفحة الإنستغرام</label>
+                                    <div class="flex">
+                                        <span class="bg-gray-100 border border-r-0 border-gray-200 rounded-r-lg px-3 py-2.5 text-gray-500 text-sm">@</span>
+                                        <input type="text" name="instagramUsername" class="w-full bg-gray-50 border border-gray-200 rounded-l-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition-all input-mobile" placeholder="username">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">البريد الإلكتروني</label>
+                                    <div class="password-input-container">
+                                        <input type="email" name="email" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition-all input-mobile" placeholder="example@email.com" required oninput="window.updateSignupFieldValidation(this)">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
+                                    <div class="password-input-container">
+                                        <input type="password" name="password" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition-all input-mobile" placeholder="••••••••" required oninput="window.updateSignupFieldValidation(this)">
+                                        <button type="button" class="password-toggle-btn" onclick="window.togglePasswordVisibility(this)">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                    <div class="password-strength-container mt-1">
+                                        <div id="password-strength-bar" class="password-strength-bar" style="width:0%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">تأكيد كلمة المرور</label>
+                                    <div class="password-input-container">
+                                        <input type="password" name="confirmPassword" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-indigo-500 transition-all input-mobile" placeholder="••••••••" required oninput="window.updateSignupFieldValidation(this)">
+                                        <button type="button" class="password-toggle-btn" onclick="window.togglePasswordVisibility(this)">
+                                            <i data-lucide="eye" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <button id="signup-submit-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] flex justify-center items-center gap-2 btn-mobile opacity-50 cursor-not-allowed" disabled>
+                                    <i data-lucide="user-plus" class="w-5 h-5"></i>
+                                    <span>إنشاء حساب</span>
+                                </button>
+                                
+                                <div class="text-center mt-4 pb-2">
+                                    <p class="text-gray-600">
+                                        لديك حساب بالفعل؟ 
+                                        <span onclick="window.showLoginForm()" class="create-account-link mr-1">تسجيل الدخول</span>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm/50 backdrop-blur-md bg-white/90 safe-area-top">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center header-mobile">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.switchView('store')">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl"><i data-lucide="store" class="w-6 h-6"></i></div>
+                <div><h1 class="text-2xl font-black text-gray-900 tracking-tighter text-title">ماشي</h1></div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="notifications-header-btn relative mr-3">
+                    <button onclick="window.switchView('notifications')" class="p-2 text-gray-600 hover:text-blue-500 transition-colors relative">
+                        <i data-lucide="bell" class="w-7 h-7"></i>
+                        <span id="notifications-count-badge" class="favorites-count-badge hidden">0</span>
+                    </button>
+                </div>
+                <div class="favorites-header-btn relative mr-3">
+                    <button onclick="window.switchView('favorites')" class="p-2 text-gray-600 hover:text-red-500 transition-colors relative">
+                        <i data-lucide="heart" class="w-7 h-7"></i>
+                        <span id="favorites-count-badge" class="favorites-count-badge hidden">0</span>
+                    </button>
+                </div>
+                <div id="user-menu" class="hidden">
+                    <div class="flex items-center gap-3 group relative">
+                        <div class="flex items-center gap-2 cursor-pointer">
+                            <div id="user-avatar"><div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"><i data-lucide="user" class="w-5 h-5"></i></div></div>
+                            <div class="hidden md:block text-right"><p id="user-name" class="text-sm font-bold text-gray-700">زائر</p><div id="user-status" class="text-xs"><span class="bg-gray-100 text-gray-500 px-2 py-1 rounded">غير مسجل</span></div></div>
+                        </div>
+                        <div class="absolute left-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 z-50 dropdown-mobile">
+                            <div class="p-2">
+                                <button onclick="window.switchView('my_products')" class="w-full text-right px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-between"><span>إعلاناتي</span><div class="flex items-center gap-2"><span id="my-products-dropdown-count" class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full hidden">0</span><i data-lucide="package" class="w-4 h-4"></i></div></button>
+                                <button onclick="window.switchView('orders')" class="w-full text-right px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-between"><span><i data-lucide="shopping-cart" class="w-4 h-4 inline ml-2 text-green-500"></i>طلباتي</span><div class="flex items-center gap-2"><span id="orders-dropdown-badge" class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full hidden">0</span><i data-lucide="chevron-left" class="w-4 h-4"></i></div></button>
+                                <button onclick="window.switchView('favorites')" class="w-full text-right px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-between"><span><i data-lucide="heart" class="w-4 h-4 inline ml-2 text-red-500"></i>المفضلة</span><div class="flex items-center gap-2"><span id="favorites-dropdown-count" class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full hidden">0</span><i data-lucide="chevron-left" class="w-4 h-4"></i></div></button>
+                                <button onclick="window.switchView('notifications')" class="w-full text-right px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-between"><span><i data-lucide="bell" class="w-4 h-4 inline ml-2 text-blue-500"></i>الإشعارات</span><div class="flex items-center gap-2"><span id="notifications-dropdown-badge" class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full hidden">0</span><i data-lucide="chevron-left" class="w-4 h-4"></i></div></button>
+                                <button onclick="window.toggleModal()" class="w-full text-right px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-between"><span>إضافة إعلان جديد</span><i data-lucide="plus-circle" class="w-4 h-4"></i></button>
+                                <div class="border-t border-gray-100 my-2"></div>
+                                <button onclick="window.handleLogout()" class="w-full text-right px-4 py-3 rounded-lg hover:bg-red-50 text-red-600 font-medium flex items-center justify-between"><span>تسجيل الخروج</span><i data-lucide="log-out" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="auth-buttons" class="flex items-center gap-3">
+                    <button onclick="window.showLoginModal()" class="text-gray-700 hover:text-indigo-600 font-bold py-2 px-4 transition-colors btn-mobile hidden sm:inline">تسجيل الدخول</button>
+                    <button onclick="window.showLoginModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 btn-mobile"><i data-lucide="user-plus" class="w-5 h-5"></i><span class="hidden sm:inline">إنشاء حساب</span></button>
+                </div>
+                <button onclick="window.toggleModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 btn-mobile"><i data-lucide="plus" class="w-5 h-5"></i><span class="hidden sm:inline">إضافة إعلان</span></button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8 main-mobile">
+        <div class="flex justify-center mb-8">
+            <div class="bg-white p-1.5 rounded-2xl border border-gray-200 shadow-sm inline-flex nav-buttons-container">
+                <button id="btn-store" onclick="window.switchView('store')" class="nav-btn active px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200">
+                    <i data-lucide="store" class="w-4 h-4 mb-1"></i>
+                    <span>السوق</span>
+                </button>
+                <button id="btn-my_products" onclick="window.switchView('my_products')" class="nav-btn bg-white text-gray-600 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200">
+                    <i data-lucide="package" class="w-4 h-4 mb-1"></i>
+                    <span>إعلاناتي</span>
+                </button>
+                <button id="btn-orders" onclick="window.switchView('orders')" class="nav-btn bg-white text-gray-600 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center gap-2">
+                    <i data-lucide="shopping-cart" class="w-4 h-4 mb-1"></i>
+                    <span>الطلبات</span>
+                    <span id="orders-badge" class="orders-badge hidden">0</span>
+                </button>
+                <button id="btn-favorites" onclick="window.switchView('favorites')" class="nav-btn bg-white text-gray-600 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200">
+                    <i data-lucide="heart" class="w-4 h-4 mb-1"></i>
+                    <span>المفضلة</span>
+                </button>
+                <button id="btn-notifications" onclick="window.switchView('notifications')" 
+                        class="nav-btn bg-white text-gray-600 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center gap-2">
+                    <i data-lucide="bell" class="w-4 h-4 mb-1"></i>
+                    <span>الإشعارات</span>
+                    <span id="notifications-tab-badge" class="orders-badge hidden">0</span>
+                </button>
+            </div>
+        </div>
+        <div id="safety-tip" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8">
+            <div class="flex items-center gap-3 mb-4"><div class="bg-amber-100 p-2 rounded-full text-amber-600"><i data-lucide="shield-alert" class="w-6 h-6"></i></div><h3 class="font-bold text-amber-800 text-lg">دليل الأمان</h3></div>
+            <ul class="space-y-3 text-sm text-amber-900/80">
+                <li class="flex items-start gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0"></i><span>**اللقاء في مكان عام:** احرص دائماً على مقابلة المشتري في أماكن عامة.</span></li>
+                <li class="flex items-start gap-2"><i data-lucide="shield" class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0"></i><span>**تحقق من البائع:** تواصل عبر واتساب وإنستغرام الرسمي فقط.</span></li>
+            </ul>
+        </div>
+        
+        <!-- عرض المتجر -->
+        <div id="store-view">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-8 w-1.5 bg-indigo-600 rounded-full"></div>
+                <h2 id="page-title" class="text-2xl font-black text-gray-900 text-title">أحدث العروض</h2>
+            </div>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 product-grid-large grid-mobile"></div>
+        </div>
+        
+        <!-- عرض إعلاناتي -->
+        <div id="seller-view" class="hidden">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-8 w-1.5 bg-green-600 rounded-full"></div>
+                <h2 class="text-2xl font-black text-gray-900 text-title">إعلاناتي</h2>
+            </div>
+            <div id="my-products-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 product-grid-large grid-mobile"></div>
+        </div>
+        
+        <!-- عرض طلباتي -->
+        <div id="orders-view" class="hidden">
+            <div class="orders-header">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-white mb-2 text-title">طلبات منتجاتي</h2>
+                        <p class="text-white/80">إدارة الطلبات الواردة على منتجاتك</p>
+                    </div>
+                    <div class="bg-white/20 p-3 rounded-xl">
+                        <div class="text-center">
+                            <p class="text-3xl font-black text-white" id="orders-header-count">0</p>
+                            <p class="text-white/80 text-sm">طلبات جديدة</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button data-orders-tab="pending" onclick="window.setOrdersTab('pending')" class="orders-tab-btn active">
+                        <i data-lucide="clock" class="w-4 h-4 inline ml-2"></i>
+                        قيد الانتظار
+                    </button>
+                    <button data-orders-tab="completed" onclick="window.setOrdersTab('completed')" class="orders-tab-btn">
+                        <i data-lucide="check-circle" class="w-4 h-4 inline ml-2"></i>
+                        المكتملة
+                    </button>
+                    <button data-orders-tab="cancelled" onclick="window.setOrdersTab('cancelled')" class="orders-tab-btn">
+                        <i data-lucide="x-circle" class="w-4 h-4 inline ml-2"></i>
+                        الملغاة
+                    </button>
+                    <button data-orders-tab="all" onclick="window.setOrdersTab('all')" class="orders-tab-btn">
+                        <i data-lucide="list" class="w-4 h-4 inline ml-2"></i>
+                        الكل
+                    </button>
+                </div>
+            </div>
+            
+            <div id="orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 grid-mobile"></div>
+        </div>
+        
+        <!-- عرض المفضلة -->
+        <div id="favorites-view" class="hidden">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-8 w-1.5 bg-red-500 rounded-full"></div>
+                <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2 text-title">
+                    <i data-lucide="heart" class="w-6 h-6 text-red-500 fill-current"></i>
+                    المفضلة
+                </h2>
+            </div>
+            <div id="favorites-container"></div>
+        </div>
+        
+        <!-- عرض الإشعارات -->
+        <div id="notifications-view" class="hidden">
+            <div class="notifications-header">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-black text-white mb-2 text-title">الإشعارات</h2>
+                        <p class="text-white/80">آخر تحديثات الطلبات والإعلانات</p>
+                    </div>
+                    <div class="bg-white/20 p-3 rounded-xl">
+                        <div class="text-center">
+                            <p class="text-3xl font-black text-white" id="notifications-header-count">0</p>
+                            <p class="text-white/80 text-sm">غير مقروءة</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button data-notifications-tab="all" onclick="window.setNotificationsTab('all')" class="notifications-tab-btn active">
+                        <i data-lucide="list" class="w-4 h-4 inline ml-2"></i>
+                        الكل
+                    </button>
+                    <button data-notifications-tab="unread" onclick="window.setNotificationsTab('unread')" class="notifications-tab-btn">
+                        <i data-lucide="bell" class="w-4 h-4 inline ml-2"></i>
+                        غير المقروءة
+                    </button>
+                    <button data-notifications-tab="orders" onclick="window.setNotificationsTab('orders')" class="notifications-tab-btn">
+                        <i data-lucide="shopping-cart" class="w-4 h-4 inline ml-2"></i>
+                        طلباتي
+                    </button>
+                    <button data-notifications-tab="system" onclick="window.setNotificationsTab('system')" class="notifications-tab-btn">
+                        <i data-lucide="settings" class="w-4 h-4 inline ml-2"></i>
+                        النظام
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-gray-900 text-lg">إدارة الإشعارات</h3>
+                        <div class="flex gap-2">
+                            <button onclick="window.markAllNotificationsAsRead()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm btn-mobile">
+                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                تعليم الكل كمقروء
+                            </button>
+                            <button onclick="window.deleteAllReadNotifications()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm btn-mobile">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                حذف المقروءة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="notifications-container" class="space-y-4"></div>
+        </div>
+    </main>
+    
+    <!-- Add Product Modal -->
+    <div id="add-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="window.toggleModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-6 sm:p-8 animate-[fade-in_0.3s_ease-out] overflow-y-auto max-h-[95vh] add-modal-container modal-mobile">
+            <div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-black text-gray-900">إضافة إعلان جديد</h3><button onclick="window.toggleModal()" class="bg-gray-100 hover:bg-red-100 hover:text-red-600 p-2 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+            <form id="add-form" onsubmit="window.submitProduct(event)" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">صورة المنتج</label>
+                    <div class="relative group cursor-pointer w-full h-56 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 transition-all overflow-hidden flex flex-col items-center justify-center text-gray-400">
+                        <input type="file" name="imageFile" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="window.handleFileSelect(event)">
+                        <div id="upload-placeholder" class="text-center"><i data-lucide="camera" class="w-10 h-10 mx-auto mb-3 text-indigo-400"></i><span class="text-sm font-semibold">اضغط للتصوير أو الاختيار</span></div>
+                        <img id="preview-image" class="absolute inset-0 w-full h-full object-cover hidden">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">اسم المنتج</label><input type="text" name="name" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-lg input-mobile" placeholder="قميص / حذاء..." required></div>
+                    <div><label class="block text-sm font-bold text-gray-700 mb-1">الماركة</label><input type="text" name="brand" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-lg input-mobile" placeholder="أديداس / زارا..." required></div>
+                </div>
+                <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">سعر المنتج (د.أ)</label>
+                    <input type="number" name="price" step="0.5" min="1" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-4 font-black text-2xl text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all input-mobile" placeholder="0.00" oninput="window.updatePrice(this)" required>
+                    <div class="mt-4 pt-3 border-t border-indigo-100 text-sm space-y-1"><div class="flex justify-between text-gray-800 font-bold text-lg"><span>السعر الإجمالي:</span><span class="text-indigo-700 text-xl"><span id="calc-price">0.00</span> د.أ</span></div></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="contact-field whatsapp-field">
+                        <label class="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-2"><div class="bg-green-100 p-2 rounded-lg"><i data-lucide="message-circle" class="w-5 h-5 text-green-600"></i></div><span class="text-lg">رقم واتساب *</span></label>
+                        <div class="flex"><span class="bg-gray-100 border border-r-0 border-gray-200 rounded-r-xl px-3 py-3 text-gray-500 flex items-center">+</span><input type="tel" name="contactPhone" class="w-full bg-gray-50 border border-gray-200 rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-lg input-mobile" placeholder="966XXXXXXXXX" required></div>
+                    </div>
+                    <div class="contact-field instagram-field">
+                        <label class="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-2"><div class="bg-pink-100 p-2 rounded-lg"><i data-lucide="instagram" class="w-5 h-5 text-pink-600"></i></div><span class="text-lg">إنستغرام</span></label>
+                        <div class="flex"><span class="bg-gray-100 border border-r-0 border-gray-200 rounded-r-xl px-3 py-3 text-gray-500 flex items-center">@</span><input type="text" name="contactInstagram" class="w-full bg-gray-50 border border-gray-200 rounded-l-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all text-lg input-mobile" placeholder="username"></div>
+                    </div>
+                </div>
+                <div><label class="block text-sm font-bold text-gray-700 mb-1">التفاصيل</label><textarea name="desc" rows="4" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-lg input-mobile" placeholder="المقاس، اللون، الحالة، ملاحظات..." required></textarea></div>
+                <div class="flex flex-col gap-3 pt-2">
+                    <button id="submit-btn" type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 transition-all active:scale-[0.98] flex justify-center items-center gap-2 text-lg btn-mobile"><span>نشر الإعلان الآن</span></button>
+                    <button type="button" onclick="window.toggleModal()" class="w-full bg-white border-2 border-gray-100 hover:bg-gray-50 text-gray-700 font-bold py-4 rounded-xl transition-colors text-lg btn-mobile">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.lucide && window.lucide.createIcons) {
+                window.lucide.createIcons();
+            }
+            window.switchView('store');
+            
+            // تهيئة Firebase
+            window.initializeFirebase();
+            
+            // تحديث الأيقونات
+            setTimeout(() => { window.refreshIcons(); }, 100);
+            
+            // التحقق الدوري من حالة التحقق بالبريد الإلكتروني
+            setInterval(() => {
+                if (window.state.isLoggedIn && !window.state.isGuest && window.userData && window.userData.emailVerified === false) {
+                    if(window.checkEmailVerificationStatus) window.checkEmailVerificationStatus();
+                }
+            }, 30000);
+            
+            // منع التكبير عند النقر على حقول الإدخال على iOS
+            document.addEventListener('touchstart', function(e) {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                    e.target.style.fontSize = '16px';
+                }
+            });
+            
+            // تحسين أداء الهواتف
+            if ('ontouchstart' in window) {
+                document.body.classList.add('touch-device');
+            }
+        });
+    </script>
+</body>
+</html>

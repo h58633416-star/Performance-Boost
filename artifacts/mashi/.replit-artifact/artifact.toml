@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "ماشي - السوق المتكامل"
+version = "1.0.0"
+id = "artifacts/mashi"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 25222
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/mashi run dev"
+
+[services.env]
+PORT = "25222"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/mashi", "run", "build"]
+publicDir = "artifacts/mashi/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
