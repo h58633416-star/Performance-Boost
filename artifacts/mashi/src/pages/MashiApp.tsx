@@ -385,14 +385,17 @@ export default function MashiApp() {
     async (productId: string) => {
       const confirmed = await showConfirm("حذف الإعلان", "هل أنت متأكد من حذف هذا الإعلان؟");
       if (!confirmed) return;
+      const removed = products.find((p) => p.id === productId);
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
       try {
         await deleteProduct(productId);
         showToast("تم حذف الإعلان بنجاح", "bg-green-600");
       } catch {
+        if (removed) setProducts((prev) => [removed, ...prev]);
         showToast("حدث خطأ أثناء الحذف", "bg-red-500");
       }
     },
-    [showConfirm, showToast]
+    [showConfirm, showToast, products]
   );
 
   const handleSubmitProduct = useCallback(
@@ -405,12 +408,16 @@ export default function MashiApp() {
       desc: string;
       imageFile: File | null;
     }) => {
-      if (!userId || !userData) return;
+      if (!userId || !userData) {
+        showToast("الرجاء تسجيل الدخول أولاً", "bg-yellow-600");
+        return;
+      }
       let imageUrl = "https://placehold.co/600x400/e2e8f0/64748b?text=صورة+المنتج";
       if (formData.imageFile) {
         imageUrl = await uploadProductImage(formData.imageFile);
       }
 
+      const createdAt = new Date().toISOString();
       const productData: Omit<Product, "id"> = {
         name: formData.name,
         brand: formData.brand,
@@ -421,13 +428,28 @@ export default function MashiApp() {
         sellerName: userData.displayName,
         sellerType: (userType as "user" | "store") || "user",
         contactPhone: formData.contactPhone,
+        sellerPhone: formData.contactPhone,
         contactInstagram: formData.contactInstagram,
-        createdAt: new Date().toISOString(),
+        sellerInstagram: formData.contactInstagram,
+        createdAt,
       };
 
-      await addProduct(productData);
+      const tempId = "temp-" + Date.now();
+      const tempProduct: Product = { id: tempId, ...productData };
+
+      setProducts((prev) => [tempProduct, ...prev]);
       setShowAddModal(false);
       showToast("تم نشر الإعلان بنجاح! 🎉", "bg-green-600");
+
+      try {
+        const realId = await addProduct(productData);
+        setProducts((prev) =>
+          prev.map((p) => (p.id === tempId ? { ...p, id: realId } : p))
+        );
+      } catch {
+        setProducts((prev) => prev.filter((p) => p.id !== tempId));
+        showToast("حدث خطأ أثناء نشر الإعلان، تحقق من الاتصال بالإنترنت", "bg-red-500");
+      }
     },
     [userId, userData, userType, showToast]
   );
