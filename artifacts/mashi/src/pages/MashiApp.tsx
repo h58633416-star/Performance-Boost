@@ -22,11 +22,12 @@ import {
   loadFavorites,
   addFavorite,
   removeFavorite,
-  loadOrders,
   submitOrder,
   updateOrderStatus,
   addNotification,
   subscribeToNotifications,
+  subscribeToSellerOrders,
+  subscribeToBuyerOrders,
   markNotificationRead,
   deleteNotificationDoc,
   markAllNotificationsRead,
@@ -61,6 +62,7 @@ export default function MashiApp() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
   const [myOrders, setMyOrders] = useState<Order[]>([]);
+  const [myPlacedOrders, setMyPlacedOrders] = useState<Order[]>([]);
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
@@ -85,6 +87,16 @@ export default function MashiApp() {
 
   const notifUnsubRef = useRef<(() => void) | null>(null);
   const productsUnsubRef = useRef<(() => void) | null>(null);
+  const sellerOrdersUnsubRef = useRef<(() => void) | null>(null);
+  const buyerOrdersUnsubRef = useRef<(() => void) | null>(null);
+
+  const [buyerSid] = useState<string>(() => {
+    const stored = localStorage.getItem("mashi_buyer_sid");
+    if (stored) return stored;
+    const newId = "bs_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+    localStorage.setItem("mashi_buyer_sid", newId);
+    return newId;
+  });
 
   const showToast = useCallback((msg: string, color = "bg-indigo-600") => {
     const id = ++toastIdRef.current;
@@ -136,15 +148,34 @@ export default function MashiApp() {
     } catch {}
   }, []);
 
-  const loadUserOrders = useCallback(async (uid: string) => {
-    try {
-      const orders = await loadOrders(uid);
-      setMyOrders(orders);
-      setNewOrdersCount(
-        orders.filter((o) => !o.isReadBySeller && o.orderStatus === "جديد").length
-      );
-    } catch {}
+  const stopSellerOrdersListener = useCallback(() => {
+    if (sellerOrdersUnsubRef.current) {
+      sellerOrdersUnsubRef.current();
+      sellerOrdersUnsubRef.current = null;
+    }
   }, []);
+
+  const startSellerOrdersListener = useCallback((uid: string) => {
+    stopSellerOrdersListener();
+    sellerOrdersUnsubRef.current = subscribeToSellerOrders(uid, (orders) => {
+      setMyOrders(orders);
+      setNewOrdersCount(orders.filter((o) => !o.isReadBySeller && o.orderStatus === "جديد").length);
+    });
+  }, [stopSellerOrdersListener]);
+
+  const stopBuyerOrdersListener = useCallback(() => {
+    if (buyerOrdersUnsubRef.current) {
+      buyerOrdersUnsubRef.current();
+      buyerOrdersUnsubRef.current = null;
+    }
+  }, []);
+
+  const startBuyerOrdersListener = useCallback((sid: string) => {
+    stopBuyerOrdersListener();
+    buyerOrdersUnsubRef.current = subscribeToBuyerOrders(sid, (orders) => {
+      setMyPlacedOrders(orders);
+    });
+  }, [stopBuyerOrdersListener]);
 
   const handleUserLogin = useCallback(
     async (user: User) => {
@@ -157,15 +188,19 @@ export default function MashiApp() {
         setIsLoggedIn(true);
         setIsGuest(false);
         loadUserFavorites(user.uid);
-        loadUserOrders(user.uid);
+        startSellerOrdersListener(user.uid);
+        const loginSid = user.uid;
+        localStorage.setItem("mashi_buyer_sid", loginSid);
+        startBuyerOrdersListener(loginSid);
         startNotifListener(user.uid);
       }
     },
-    [loadUserFavorites, loadUserOrders, startNotifListener]
+    [loadUserFavorites, startSellerOrdersListener, startBuyerOrdersListener, startNotifListener]
   );
 
   useEffect(() => {
     startProductListener();
+    startBuyerOrdersListener(buyerSid);
 
     const unsubAuth = onAuthStateChanged(auth, async (user) => {
       if (user && !isGuest) {
@@ -182,6 +217,7 @@ export default function MashiApp() {
         setNotifications([]);
         setUnreadNotifCount(0);
         stopNotifListener();
+        stopSellerOrdersListener();
       }
     });
 
@@ -189,13 +225,15 @@ export default function MashiApp() {
       unsubAuth();
       if (productsUnsubRef.current) productsUnsubRef.current();
       stopNotifListener();
+      stopSellerOrdersListener();
+      stopBuyerOrdersListener();
     };
   }, []);
 
   const switchView = useCallback(
     (view: View) => {
-      const protectedViews: View[] = ["my_products", "favorites", "orders", "notifications"];
-      if (protectedViews.includes(view) && !isLoggedIn) {
+      const strictlyProtected: View[] = ["my_products", "favorites", "notifications"];
+      if (strictlyProtected.includes(view) && !isLoggedIn) {
         showToast("الرجاء تسجيل الدخول للوصول إلى هذه الصفحة", "bg-yellow-600");
         setShowLoginModal(true);
         return;
@@ -263,6 +301,7 @@ export default function MashiApp() {
     if (!confirmed) return;
 
     stopNotifListener();
+    stopSellerOrdersListener();
     setIsLoggedIn(false);
     setIsGuest(false);
     setUserType(null);
@@ -271,6 +310,7 @@ export default function MashiApp() {
     setFavorites([]);
     setLikedProducts(new Set());
     setMyOrders([]);
+    setMyPlacedOrders([]);
     setNewOrdersCount(0);
     setNotifications([]);
     setUnreadNotifCount(0);
@@ -486,7 +526,7 @@ export default function MashiApp() {
         orderStatus: "جديد",
         orderType: "طلب فوري",
         isGuestOrder: !isLoggedIn || isGuest,
-        guestSessionId: userId || ("guest-" + Date.now()),
+        guestSessionId: buyerSid,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isReadBySeller: false,
@@ -509,7 +549,7 @@ export default function MashiApp() {
         /* allow even if Firestore fails — success screen still shows */
       }
     },
-    [orderModalProduct, isLoggedIn, isGuest, userId]
+    [orderModalProduct, isLoggedIn, isGuest, buyerSid]
   );
 
   const handleUpdateOrderStatus = useCallback(
@@ -733,11 +773,13 @@ export default function MashiApp() {
         )}
         {currentView === "orders" && (
           <OrdersView
-            orders={myOrders}
+            sellerOrders={myOrders}
+            buyerOrders={myPlacedOrders}
             tab={ordersTab}
             onTabChange={setOrdersTab}
             onUpdateStatus={handleUpdateOrderStatus}
             newOrdersCount={newOrdersCount}
+            isSeller={isLoggedIn && !isGuest}
           />
         )}
         {currentView === "favorites" && (

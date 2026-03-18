@@ -68,25 +68,45 @@ export async function removeFavorite(favoriteId: string): Promise<void> {
 
 export async function loadOrders(sellerId: string): Promise<Order[]> {
   try {
-    const q = query(
-      collection(db, "orders"),
-      where("sellerId", "==", sellerId),
-      orderBy("createdAt", "desc")
-    );
+    const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
-  } catch (e: unknown) {
-    const err = e as { code?: string };
-    if (err?.code === "failed-precondition") {
-      const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
-      const snap = await getDocs(q);
-      const orders = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
-      return orders.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    }
-    throw e;
+    const orders = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
+    return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch {
+    return [];
   }
+}
+
+export function subscribeToSellerOrders(
+  sellerId: string,
+  callback: (orders: Order[]) => void
+): Unsubscribe {
+  const q = query(collection(db, "orders"), where("sellerId", "==", sellerId));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const orders = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
+      orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      callback(orders);
+    },
+    () => callback([])
+  );
+}
+
+export function subscribeToBuyerOrders(
+  sessionId: string,
+  callback: (orders: Order[]) => void
+): Unsubscribe {
+  const q = query(collection(db, "orders"), where("guestSessionId", "==", sessionId));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const orders = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }));
+      orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      callback(orders);
+    },
+    () => callback([])
+  );
 }
 
 export async function submitOrder(data: Omit<Order, "id">): Promise<string> {
