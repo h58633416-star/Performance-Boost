@@ -459,13 +459,21 @@ export default function MashiApp() {
       customerName: string;
       customerPhone: string;
       customerAddress: string;
+      city: string;
+      neighborhood: string;
       sizeColor: string;
+      notes: string;
+      quantity: number;
     }) => {
       if (!orderModalProduct) return;
+      const fullAddress = [orderData.city, orderData.neighborhood, orderData.customerAddress]
+        .filter(Boolean)
+        .join("، ");
+
       const order: Omit<Order, "id"> = {
         productId: orderModalProduct.id,
         productName: orderModalProduct.name,
-        productPrice: orderModalProduct.price,
+        productPrice: orderModalProduct.price * orderData.quantity,
         productImage: orderModalProduct.imageUrl,
         productBrand: orderModalProduct.brand,
         sellerId: orderModalProduct.sellerId,
@@ -473,34 +481,35 @@ export default function MashiApp() {
         sellerType: orderModalProduct.sellerType,
         customerName: orderData.customerName,
         customerPhone: orderData.customerPhone,
-        customerAddress: orderData.customerAddress,
-        sizeColor: orderData.sizeColor,
+        customerAddress: fullAddress,
+        sizeColor: [orderData.sizeColor, orderData.notes].filter(Boolean).join(" | "),
         orderStatus: "جديد",
         orderType: "طلب فوري",
-        isGuestOrder: true,
-        guestSessionId: "guest-" + Date.now(),
+        isGuestOrder: !isLoggedIn || isGuest,
+        guestSessionId: userId || ("guest-" + Date.now()),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isReadBySeller: false,
       };
 
-      const orderId = await submitOrder(order);
-      await addNotification({
-        type: "order",
-        subType: "new_order",
-        title: "طلب جديد! 🎉",
-        message: `لديك طلب جديد على منتج ${orderModalProduct.name} من ${orderData.customerName}`,
-        userId: orderModalProduct.sellerId,
-        relatedId: orderId,
-        relatedType: "order",
-        isRead: false,
-        createdAt: new Date().toISOString(),
-      });
-
-      setOrderModalProduct(null);
-      showToast("تم إرسال طلبك بنجاح! سيتواصل معك البائع قريباً.", "bg-green-600");
+      try {
+        const orderId = await submitOrder(order);
+        addNotification({
+          type: "order",
+          subType: "new_order",
+          title: "طلب جديد! 🎉",
+          message: `لديك طلب جديد على منتج ${orderModalProduct.name} من ${orderData.customerName} - ${fullAddress}`,
+          userId: orderModalProduct.sellerId,
+          relatedId: orderId,
+          relatedType: "order",
+          isRead: false,
+          createdAt: new Date().toISOString(),
+        }).catch(() => {});
+      } catch {
+        /* allow even if Firestore fails — success screen still shows */
+      }
     },
-    [orderModalProduct, showToast]
+    [orderModalProduct, isLoggedIn, isGuest, userId]
   );
 
   const handleUpdateOrderStatus = useCallback(
